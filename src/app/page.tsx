@@ -326,14 +326,83 @@ function Scene3D() {
       
       <AnimatedSphere />
       
+      {/* Rolling glass shapes */}
       <GlassShape position={[-3.5, 2, -2]} geometry="icosahedron" color="#14b8a6" speed={0.5} scale={0.6} />
       <GlassShape position={[3.5, -1, -1]} geometry="torus" color="#fbbf24" speed={0.8} scale={0.55} />
       <GlassShape position={[-2.5, -2, 1]} geometry="octahedron" color="#a855f7" speed={0.6} scale={0.5} />
       <GlassShape position={[3, 2, 0]} geometry="dodecahedron" color="#f97316" speed={0.7} scale={0.45} />
+
+      {/* The Hero — a large glass rolling wheel */}
+      <RollingWheel />
       
       <Stars radius={50} depth={30} count={1500} factor={3} saturation={0} fade speed={0.5} />
       <ParticleField />
     </>
+  )
+}
+
+// ============ ROLLING GLASS WHEEL ============
+
+function RollingWheel() {
+  const wheelRef = useRef<any>(null)
+  const groupRef = useRef<any>(null)
+
+  // The wheel rolls along the X axis
+  useFrame((state) => {
+    const t = state.clock.elapsedTime
+    if (wheelRef.current) {
+      wheelRef.current.rotation.z = t * 0.8 // spin
+    }
+    if (groupRef.current) {
+      // Roll left and right
+      groupRef.current.position.x = Math.sin(t * 0.3) * 4
+      // Y position follows the ground
+      groupRef.current.position.y = -2.5
+    }
+  })
+
+  return (
+    <group ref={groupRef}>
+      {/* Main wheel — glass torus */}
+      <mesh ref={wheelRef}>
+        <torusGeometry args={[1.5, 0.4, 32, 100]} />
+        <meshPhysicalMaterial
+          color="#14b8a6"
+          roughness={0.05}
+          metalness={0.1}
+          transmission={0.85}
+          thickness={0.8}
+          transparent
+          opacity={0.7}
+          ior={1.5}
+          clearcoat={1}
+          clearcoatRoughness={0.05}
+        />
+      </mesh>
+
+      {/* Wireframe overlay on wheel */}
+      <mesh ref={wheelRef} scale={1.01}>
+        <torusGeometry args={[1.5, 0.4, 16, 32]} />
+        <meshBasicMaterial color="#fbbf24" wireframe transparent opacity={0.2} />
+      </mesh>
+
+      {/* Spokes */}
+      {[0, 60, 120, 180, 240, 300].map((deg) => {
+        const rad = (deg * Math.PI) / 180
+        return (
+          <mesh key={deg} ref={wheelRef} position={[0, 0, 0]} rotation={[0, 0, rad]}>
+            <boxGeometry args={[2.8, 0.05, 0.05]} />
+            <meshPhysicalMaterial color="#fbbf24" roughness={0.1} metalness={0.8} />
+          </mesh>
+        )
+      })}
+
+      {/* Inner hub */}
+      <mesh ref={wheelRef}>
+        <cylinderGeometry args={[0.25, 0.25, 0.15, 32]} />
+        <meshPhysicalMaterial color="#a855f7" roughness={0.1} metalness={0.9} clearcoat={1} />
+      </mesh>
+    </group>
   )
 }
 
