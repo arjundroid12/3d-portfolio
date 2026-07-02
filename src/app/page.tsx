@@ -88,6 +88,107 @@ function useSoundEffects() {
     setTimeout(() => playTone(1047, 0.2, 'sine', 0.04), 240)
   }, [playTone])
 
+  // ============ LOFI BACKGROUND MUSIC ============
+  const musicNodesRef = useRef<any>(null)
+
+  const startMusic = useCallback(() => {
+    if (musicNodesRef.current) return
+    try {
+      const ctx = getCtx()
+      const masterGain = ctx.createGain()
+      masterGain.gain.setValueAtTime(0, ctx.currentTime)
+      masterGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 2)
+      masterGain.connect(ctx.destination)
+
+      // Lofi chord progression (Am - F - C - G in lofi style)
+      const chords = [
+        [220, 261.63, 329.63], // Am: A C E
+        [174.61, 220, 261.63], // F: F A C
+        [261.63, 329.63, 392], // C: C E G
+        [196, 246.94, 293.66], // G: G B D
+      ]
+
+      let chordIndex = 0
+      const playChord = () => {
+        if (!musicNodesRef.current) return
+        const chord = chords[chordIndex]
+        const now = ctx.currentTime
+
+        // Pad chord
+        chord.forEach((freq) => {
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.type = 'sine'
+          osc.frequency.value = freq
+          gain.gain.setValueAtTime(0, now)
+          gain.gain.linearRampToValueAtTime(0.3, now + 0.5)
+          gain.gain.linearRampToValueAtTime(0, now + 3.5)
+          osc.connect(gain)
+          gain.connect(masterGain)
+          osc.start(now)
+          osc.stop(now + 4)
+        })
+
+        // Bass note
+        const bassOsc = ctx.createOscillator()
+        const bassGain = ctx.createGain()
+        bassOsc.type = 'triangle'
+        bassOsc.frequency.value = chord[0] / 2
+        bassGain.gain.setValueAtTime(0, now)
+        bassGain.gain.linearRampToValueAtTime(0.2, now + 0.3)
+        bassGain.gain.linearRampToValueAtTime(0, now + 3.5)
+        bassOsc.connect(bassGain)
+        bassGain.connect(masterGain)
+        bassOsc.start(now)
+        bassOsc.stop(now + 4)
+
+        // Melody note (random from chord)
+        const melodyOsc = ctx.createOscillator()
+        const melodyGain = ctx.createGain()
+        melodyOsc.type = 'sine'
+        melodyOsc.frequency.value = chord[Math.floor(Math.random() * chord.length)] * 2
+        melodyGain.gain.setValueAtTime(0, now + 1)
+        melodyGain.gain.linearRampToValueAtTime(0.1, now + 1.3)
+        melodyGain.gain.linearRampToValueAtTime(0, now + 2.5)
+        melodyOsc.connect(melodyGain)
+        melodyGain.connect(masterGain)
+        melodyOsc.start(now + 1)
+        melodyOsc.stop(now + 3)
+
+        chordIndex = (chordIndex + 1) % chords.length
+      }
+
+      playChord()
+      const interval = setInterval(playChord, 4000)
+      musicNodesRef.current = { masterGain, interval }
+    } catch {}
+  }, [getCtx])
+
+  const stopMusic = useCallback(() => {
+    if (!musicNodesRef.current) return
+    try {
+      const ctx = getCtx()
+      musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1)
+      clearInterval(musicNodesRef.current.interval)
+      setTimeout(() => {
+        if (musicNodesRef.current) {
+          musicNodesRef.current.masterGain.disconnect()
+          musicNodesRef.current = null
+        }
+      }, 1500)
+    } catch {}
+  }, [getCtx])
+
+  // Start/stop music based on enabled state
+  useEffect(() => {
+    if (enabled) {
+      startMusic()
+    } else {
+      stopMusic()
+    }
+    
+  }, [enabled])
+
   return { enabled, setEnabled, playHover, playClick, playModalOpen, playModalClose, playNavHover, playFilter, playScroll, playWarp, playPop, playSuccess }
 }
 
@@ -191,6 +292,137 @@ function ParticleField() {
   )
 }
 
+// ============ TECH 3D OBJECTS ============
+
+function Monitor({ position, scale = 1 }) {
+  const ref = useRef<any>(null)
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.3
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.2
+    }
+  })
+  return (
+    <Float speed={1} rotationIntensity={0.3} floatIntensity={1}>
+      <group ref={ref} position={position} scale={scale}>
+        {/* Monitor body */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[1.2, 0.8, 0.1]} />
+          <meshStandardMaterial color="#1a1a2e" roughness={0.3} metalness={0.8} />
+        </mesh>
+        {/* Screen (glowing) */}
+        <mesh position={[0, 0, 0.06]}>
+          <planeGeometry args={[1.05, 0.65]} />
+          <meshStandardMaterial color="#14b8a6" emissive="#14b8a6" emissiveIntensity={0.6} />
+        </mesh>
+        {/* Stand */}
+        <mesh position={[0, -0.55, 0]}>
+          <boxGeometry args={[0.15, 0.3, 0.1]} />
+          <meshStandardMaterial color="#1a1a2e" roughness={0.3} metalness={0.8} />
+        </mesh>
+        {/* Base */}
+        <mesh position={[0, -0.72, 0]}>
+          <boxGeometry args={[0.5, 0.05, 0.3]} />
+          <meshStandardMaterial color="#1a1a2e" roughness={0.3} metalness={0.8} />
+        </mesh>
+      </group>
+    </Float>
+  )
+}
+
+function PCTower({ position, scale = 1 }) {
+  const ref = useRef<any>(null)
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.4) * 0.15
+      ref.current.position.y = position[1] + Math.cos(state.clock.elapsedTime * 0.4) * 0.2
+    }
+  })
+  return (
+    <Float speed={1.2} rotationIntensity={0.4} floatIntensity={1.2}>
+      <group ref={ref} position={position} scale={scale}>
+        {/* Tower body */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[0.6, 1.3, 0.8]} />
+          <meshStandardMaterial color="#0f0f1e" roughness={0.2} metalness={0.9} />
+        </mesh>
+        {/* Power button (glowing) */}
+        <mesh position={[0, 0.5, 0.41]}>
+          <circleGeometry args={[0.06, 16]} />
+          <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.8} />
+        </mesh>
+        {/* LED strip */}
+        <mesh position={[0, 0.2, 0.41]}>
+          <planeGeometry args={[0.4, 0.04]} />
+          <meshStandardMaterial color="#a855f7" emissive="#a855f7" emissiveIntensity={0.7} />
+        </mesh>
+        {/* Vent lines */}
+        <mesh position={[0, -0.3, 0.41]}>
+          <planeGeometry args={[0.4, 0.15]} />
+          <meshStandardMaterial color="#1a1a2e" />
+        </mesh>
+      </group>
+    </Float>
+  )
+}
+
+function Laptop({ position, scale = 1 }) {
+  const ref = useRef<any>(null)
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.2
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.6) * 0.15
+    }
+  })
+  return (
+    <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
+      <group ref={ref} position={position} scale={scale}>
+        {/* Screen */}
+        <mesh position={[0, 0.35, -0.2]} rotation={[-0.2, 0, 0]}>
+          <boxGeometry args={[1.1, 0.7, 0.06]} />
+          <meshStandardMaterial color="#1a1a2e" roughness={0.2} metalness={0.8} />
+        </mesh>
+        {/* Screen display */}
+        <mesh position={[0, 0.35, -0.17]} rotation={[-0.2, 0, 0]}>
+          <planeGeometry args={[0.95, 0.55]} />
+          <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.5} />
+        </mesh>
+        {/* Keyboard base */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[1.1, 0.05, 0.7]} />
+          <meshStandardMaterial color="#0f0f1e" roughness={0.3} metalness={0.7} />
+        </mesh>
+      </group>
+    </Float>
+  )
+}
+
+function Phone3D({ position, scale = 1 }) {
+  const ref = useRef<any>(null)
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.z = state.clock.elapsedTime * 0.3
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.7) * 0.25
+    }
+  })
+  return (
+    <Float speed={2} rotationIntensity={0.8} floatIntensity={1.5}>
+      <group ref={ref} position={position} scale={scale}>
+        {/* Phone body */}
+        <mesh>
+          <boxGeometry args={[0.4, 0.8, 0.05]} />
+          <meshStandardMaterial color="#0f0f1e" roughness={0.1} metalness={0.95} />
+        </mesh>
+        {/* Screen */}
+        <mesh position={[0, 0, 0.03]}>
+          <planeGeometry args={[0.32, 0.7]} />
+          <meshStandardMaterial color="#14b8a6" emissive="#14b8a6" emissiveIntensity={0.6} />
+        </mesh>
+      </group>
+    </Float>
+  )
+}
+
 function Scene3D() {
   return (
     <>
@@ -202,12 +434,12 @@ function Scene3D() {
       
       <AnimatedSphere />
       
-      <FloatingShape position={[-4.5, 2.5, -2]} geometry="dodecahedron" color="#fbbf24" speed={0.6} scale={0.7} />
-      <FloatingShape position={[4.5, -1, -1]} geometry="torus" color="#a855f7" speed={1} scale={0.65} />
-      <FloatingShape position={[-3, -2.5, 1]} geometry="tetrahedron" color="#14b8a6" speed={0.8} scale={0.6} />
-      <FloatingShape position={[3.5, 2.5, 0]} geometry="octahedron" color="#f97316" speed={0.9} scale={0.5} />
-      <FloatingShape position={[0, -3, -1]} geometry="cone" color="#fbbf24" speed={0.7} scale={0.55} />
-      <FloatingShape position={[-4, 0, 2]} geometry="capsule" color="#a855f7" speed={1.1} scale={0.45} />
+      {/* Tech gadgets replacing geometric shapes */}
+      <Monitor position={[-4.5, 2.5, -2]} scale={0.8} />
+      <PCTower position={[4.5, -1, -1]} scale={0.7} />
+      <Laptop position={[-3.5, -2.5, 1]} scale={0.7} />
+      <Phone3D position={[4, 2.5, 0]} scale={0.6} />
+      <Monitor position={[3, -2, 1.5]} scale={0.5} />
       
       <Stars radius={60} depth={50} count={2500} factor={4} saturation={0} fade speed={0.5} />
       <ParticleField />
@@ -415,12 +647,15 @@ function FunPopups({ enabled }: { enabled: boolean }) {
   )
 }
 
-// ============ SCROLL WARP (scroll past bottom → back to hero) ============
+// ============ SCROLL WARP (with confirmation popup) ============
 
-function ScrollWarp({ onWarp }: { onWarp: () => void }) {
+function ScrollWarp({ onWarp, onConfirm }: { onWarp: () => void; onConfirm?: () => void }) {
   const [warping, setWarping] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const lastScrollY = useRef(0)
   const warpTriggered = useRef(false)
+  const confirmDismissTimer = useRef<any>(null)
+  const atBottomRef = useRef(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -432,18 +667,40 @@ function ScrollWarp({ onWarp }: { onWarp: () => void }) {
       lastScrollY.current = scrollY
 
       if (atBottom && scrollingDown && !warpTriggered.current) {
-        warpTriggered.current = true
-        setWarping(true)
-        onWarp()
-        // Give the warp animation time to play before scrolling
-        setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        }, 1500)
-        // Keep the overlay visible during scroll + fade out
-        setTimeout(() => {
-          setWarping(false)
-          warpTriggered.current = false
-        }, 3500)
+        if (!atBottomRef.current) {
+          // First time reaching bottom — show confirmation
+          atBottomRef.current = true
+          setShowConfirm(true)
+          onConfirm?.()
+
+          // Auto-dismiss after 5 seconds if they don't scroll again
+          confirmDismissTimer.current = setTimeout(() => {
+            setShowConfirm(false)
+            atBottomRef.current = false
+          }, 5000)
+        } else {
+          // Second scroll at bottom — trigger warp!
+          clearTimeout(confirmDismissTimer.current)
+          setShowConfirm(false)
+          warpTriggered.current = true
+          setWarping(true)
+          onWarp()
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }, 1500)
+          setTimeout(() => {
+            setWarping(false)
+            warpTriggered.current = false
+            atBottomRef.current = false
+          }, 3500)
+        }
+      }
+
+      // If user scrolls up, dismiss confirmation
+      if (!atBottom && atBottomRef.current && !warpTriggered.current) {
+        clearTimeout(confirmDismissTimer.current)
+        setShowConfirm(false)
+        atBottomRef.current = false
       }
     }
 
@@ -451,16 +708,48 @@ function ScrollWarp({ onWarp }: { onWarp: () => void }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [onWarp])
 
-  if (!warping) return null
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center overflow-hidden"
-    >
+    <>
+      {/* Confirmation popup */}
+      <AnimatePresence>
+        {showConfirm && !warping && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.8 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-4 bg-white/10 backdrop-blur-xl border border-teal-500/30 rounded-2xl shadow-2xl pointer-events-none"
+          >
+            <div className="flex items-center gap-3">
+              <motion.span
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="text-2xl"
+              >
+                🚀
+              </motion.span>
+              <div>
+                <p className="text-white font-semibold text-sm">
+                  Scroll one more time to fly to the top!
+                </p>
+                <p className="text-gray-400 text-xs mt-0.5">
+                  Or scroll up to stay here
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Warp overlay */}
+      {warping && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center overflow-hidden"
+        >
       {/* Dark backdrop that fades in */}
       <motion.div
         className="absolute inset-0 bg-black"
@@ -555,6 +844,8 @@ function ScrollWarp({ onWarp }: { onWarp: () => void }) {
         </motion.div>
       </motion.div>
     </motion.div>
+      )}
+    </>
   )
 }
 
@@ -677,7 +968,7 @@ export default function Home() {
 
       {/* ============ SCROLL WARP OVERLAY ============ */}
       <AnimatePresence>
-        <ScrollWarp onWarp={() => { sound.playWarp() }} />
+        <ScrollWarp onWarp={() => { sound.playWarp() }} onConfirm={() => sound.playPop()} />
       </AnimatePresence>
 
       {/* ============ DYNAMIC COLOR AURORA BACKGROUND ============ */}
@@ -1245,9 +1536,9 @@ export default function Home() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-indigo-400/60 text-xs font-mono mt-2"
+            className="text-teal-400/60 text-xs font-mono mt-2"
           >
-            💡 Scroll past the bottom for a surprise...
+            💡 Scroll past the bottom to fly back to the top...
           </motion.p>
         </div>
       </footer>
