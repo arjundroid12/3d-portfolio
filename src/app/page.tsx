@@ -1153,11 +1153,12 @@ export default function Home() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => {
-                if (!enabled) {
-                  getCtx() // Initialize AudioContext on user gesture
-                  sound.playClick()
+                if (!sound.enabled) {
+                  sound.setEnabled(true)
+                  setTimeout(() => sound.playClick(), 100)
+                } else {
+                  sound.setEnabled(false)
                 }
-                sound.setEnabled(!enabled)
               }}
               className="ml-2 p-2 rounded-lg border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-colors"
               title={sound.enabled ? "Mute sounds" : "Enable sounds"}
