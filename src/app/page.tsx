@@ -88,7 +88,7 @@ function useSoundEffects() {
     setTimeout(() => playTone(1047, 0.2, 'sine', 0.04), 240)
   }, [playTone])
 
-  // ============ SMOOTH AMBIENT DRONE (optimized) ============
+  // ============ SMOOTH AMBIENT MUSIC (optimized) ============
   const musicNodesRef = useRef<any>(null)
 
   const startMusic = useCallback(() => {
@@ -97,42 +97,53 @@ function useSoundEffects() {
       const ctx = getCtx()
       const masterGain = ctx.createGain()
       masterGain.gain.setValueAtTime(0, ctx.currentTime)
-      masterGain.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 3)
+      masterGain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 3)
       masterGain.connect(ctx.destination)
 
-      // Simple ambient drone — 2 sustained oscillators with slow LFO
-      const drone1 = ctx.createOscillator()
-      const drone2 = ctx.createOscillator()
-      const droneGain1 = ctx.createGain()
-      const droneGain2 = ctx.createGain()
+      // Warm ambient pad — 3 oscillators creating a lush chord
+      const notes = [
+        { freq: 130.81, type: 'sine' as OscillatorType, gain: 0.4 },     // C3
+        { freq: 196.00, type: 'sine' as OscillatorType, gain: 0.3 },     // G3
+        { freq: 261.63, type: 'triangle' as OscillatorType, gain: 0.15 }, // C4
+      ]
 
-      drone1.type = 'sine'
-      drone1.frequency.value = 110 // A2
-      drone2.type = 'sine'
-      drone2.frequency.value = 164.81 // E3
+      const oscillators: any[] = []
+      const gains: any[] = []
 
-      droneGain1.gain.value = 0.5
-      droneGain2.gain.value = 0.3
+      notes.forEach((note) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = note.type
+        osc.frequency.value = note.freq
+        gain.gain.value = note.gain
+        osc.connect(gain)
+        gain.connect(masterGain)
+        osc.start()
+        oscillators.push(osc)
+        gains.push(gain)
+      })
 
-      // Slow LFO for gentle volume modulation
-      const lfo = ctx.createOscillator()
-      const lfoGain = ctx.createGain()
-      lfo.type = 'sine'
-      lfo.frequency.value = 0.08 // Very slow (12 second cycle)
-      lfoGain.gain.value = 0.15
-      lfo.connect(lfoGain)
-      lfoGain.connect(droneGain1.gain)
+      // Slow detune LFO for warmth — subtle pitch wobble
+      const detuneLfo = ctx.createOscillator()
+      const detuneLfoGain = ctx.createGain()
+      detuneLfo.type = 'sine'
+      detuneLfo.frequency.value = 0.15
+      detuneLfoGain.gain.value = 3
+      detuneLfo.connect(detuneLfoGain)
+      oscillators.forEach((osc) => detuneLfoGain.connect(osc.detune))
+      detuneLfo.start()
 
-      drone1.connect(droneGain1)
-      drone2.connect(droneGain2)
-      droneGain1.connect(masterGain)
-      droneGain2.connect(masterGain)
+      // Volume LFO for breathing effect
+      const volLfo = ctx.createOscillator()
+      const volLfoGain = ctx.createGain()
+      volLfo.type = 'sine'
+      volLfo.frequency.value = 0.06
+      volLfoGain.gain.value = 0.08
+      volLfo.connect(volLfoGain)
+      volLfoGain.connect(masterGain.gain)
+      volLfo.start()
 
-      drone1.start()
-      drone2.start()
-      lfo.start()
-
-      musicNodesRef.current = { masterGain, drone1, drone2, lfo }
+      musicNodesRef.current = { masterGain, oscillators, detuneLfo, volLfo }
     } catch {}
   }, [getCtx])
 
@@ -140,19 +151,44 @@ function useSoundEffects() {
     if (!musicNodesRef.current) return
     try {
       const ctx = getCtx()
-      const { masterGain, drone1, drone2, lfo } = musicNodesRef.current
+      const { masterGain, oscillators, detuneLfo, volLfo } = musicNodesRef.current
       masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1)
       setTimeout(() => {
         try {
-          drone1.stop()
-          drone2.stop()
-          lfo.stop()
+          oscillators.forEach((osc: any) => osc.stop())
+          detuneLfo.stop()
+          volLfo.stop()
           masterGain.disconnect()
         } catch {}
         musicNodesRef.current = null
       }, 1500)
     } catch {}
   }, [getCtx])
+
+  // ============ TAB VISIBILITY — pause/resume audio ============
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        // Tab hidden — fade out music
+        if (musicNodesRef.current) {
+          try {
+            const ctx = getCtx()
+            musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5)
+          } catch {}
+        }
+      } else {
+        // Tab visible again — fade music back in
+        if (musicNodesRef.current && enabled) {
+          try {
+            const ctx = getCtx()
+            musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 1)
+          } catch {}
+        }
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [enabled, getCtx])
 
   // Start/stop music based on enabled state
   useEffect(() => {
@@ -738,7 +774,7 @@ function TiltCard({ project, onClick, onHover }: { project: any; onClick: () => 
       onClick={onClick}
       className="cursor-pointer"
     >
-      <Card className="bg-white/[0.03] backdrop-blur-xl border-white/10 hover:border-indigo-500/40 transition-colors duration-300 h-full overflow-hidden group relative">
+      <Card className="liquid-glass h-full overflow-hidden group relative">
         {/* Glow effect on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-indigo-500/10 group-hover:via-purple-500/5 group-hover:to-pink-500/10 transition-all duration-500 pointer-events-none" />
         
@@ -882,7 +918,7 @@ export default function Home() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/30 border-b border-white/5"
+        className="fixed top-0 left-0 right-0 z-50 liquid-glass-nav"
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <motion.a
@@ -1057,7 +1093,7 @@ export default function Home() {
                 transition={{ delay: 1.3 + i * 0.1, type: 'spring' }}
                 whileHover={{ scale: 1.15, y: -5, rotateZ: 5 }}
                 onMouseEnter={() => sound.playHover()}
-                className="px-3 py-1 text-xs font-mono text-gray-400 bg-black/40 backdrop-blur-sm border border-white/10 rounded-full cursor-pointer"
+                className="px-3 py-1 text-xs font-mono text-gray-400 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-sm cursor-pointer"
               >
                 {tech}
               </motion.span>
@@ -1106,7 +1142,7 @@ export default function Home() {
                 whileHover={{ y: -8, scale: 1.02 }}
                 onMouseEnter={() => sound.playPop()}
               >
-                <Card className="relative overflow-hidden bg-white/[0.03] backdrop-blur-xl border-white/10 hover:border-white/20 transition-all duration-300 h-full">
+                <Card className="relative overflow-hidden liquid-glass h-full">
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${agent.gradient}`} />
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -1165,7 +1201,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="bg-white/[0.03] backdrop-blur-xl border-white/10 text-center">
+                <Card className="liquid-glass text-center">
                   <CardContent className="pt-6">
                     <div className={`text-3xl font-bold ${stat.color} font-mono`}>{stat.value}</div>
                     <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">{stat.label}</div>
@@ -1204,8 +1240,8 @@ export default function Home() {
                 onMouseEnter={() => sound.playNavHover()}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   activeFilter === cat
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                    ? 'bg-teal-500/20 text-teal-300 border border-teal-500/30'
+                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 backdrop-blur-md'
                 }`}
               >
                 {cat}
@@ -1343,7 +1379,7 @@ export default function Home() {
                 onMouseEnter={() => sound.playPop()}
                 onClick={() => sound.playClick()}
               >
-                <Card className="bg-white/[0.03] backdrop-blur-xl border-white/10 hover:border-indigo-500/30 transition-all text-center h-full">
+                <Card className="liquid-glass text-center h-full">
                   <CardContent className="pt-6 pb-4">
                     <contact.icon className="w-6 h-6 mx-auto mb-3 text-indigo-400" />
                     <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{contact.label}</div>
@@ -1359,7 +1395,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <Card className="bg-white/[0.03] backdrop-blur-xl border-white/10 text-center p-8">
+            <Card className="liquid-glass text-center p-8">
               <Sparkles className="w-8 h-8 mx-auto mb-4 text-purple-400" />
               <h3 className="text-xl font-bold mb-3">Have a project in mind?</h3>
               <p className="text-gray-500 mb-6">I'm always interested in hearing about new ideas and AI collaborations.</p>
