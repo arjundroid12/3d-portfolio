@@ -569,14 +569,14 @@ function FunPopups({ enabled }: { enabled: boolean }) {
   )
 }
 
-// ============ MORPH TRANSITION (bottom → hero) ============
+// ============ CURTAIN WIPE TRANSITION ============
 
-function MorphTransition({ onMorph }: { onMorph: () => void }) {
-  const [morphing, setMorphing] = useState(false)
+function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
+  const [active, setActive] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const lastScrollY = useRef(0)
-  const morphTriggered = useRef(false)
-  const confirmDismissTimer = useRef<any>(null)
+  const triggered = useRef(false)
+  const dismissTimer = useRef<any>(null)
   const atBottomRef = useRef(false)
 
   useEffect(() => {
@@ -588,37 +588,32 @@ function MorphTransition({ onMorph }: { onMorph: () => void }) {
       const scrollingDown = scrollY > lastScrollY.current
       lastScrollY.current = scrollY
 
-      if (atBottom && scrollingDown && !morphTriggered.current) {
+      if (atBottom && scrollingDown && !triggered.current) {
         if (!atBottomRef.current) {
           atBottomRef.current = true
           setShowConfirm(true)
-          onMorph?.('confirm')
-
-          confirmDismissTimer.current = setTimeout(() => {
+          onMorph('confirm')
+          dismissTimer.current = setTimeout(() => {
             setShowConfirm(false)
             atBottomRef.current = false
           }, 5000)
         } else {
-          clearTimeout(confirmDismissTimer.current)
+          clearTimeout(dismissTimer.current)
           setShowConfirm(false)
-          morphTriggered.current = true
-          setMorphing(true)
-          onMorph?.('warp')
-
-          // Wait 2.5s for the morph to play, then scroll
+          triggered.current = true
+          setActive(true)
+          onMorph('warp')
+          setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 2200)
           setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-          }, 2500)
-          setTimeout(() => {
-            setMorphing(false)
-            morphTriggered.current = false
+            setActive(false)
+            triggered.current = false
             atBottomRef.current = false
-          }, 4500)
+          }, 4000)
         }
       }
 
-      if (!atBottom && atBottomRef.current && !morphTriggered.current) {
-        clearTimeout(confirmDismissTimer.current)
+      if (!atBottom && atBottomRef.current && !triggered.current) {
+        clearTimeout(dismissTimer.current)
         setShowConfirm(false)
         atBottomRef.current = false
       }
@@ -632,124 +627,101 @@ function MorphTransition({ onMorph }: { onMorph: () => void }) {
     <>
       {/* Confirmation popup */}
       <AnimatePresence>
-        {showConfirm && !morphing && (
+        {showConfirm && !active && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.8 }}
+            exit={{ opacity: 0, y: 30, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-4 liquid-glass border border-teal-500/30 rounded-2xl shadow-2xl pointer-events-none"
           >
             <div className="flex items-center gap-3">
-              <motion.span animate={{ y: [0, -5, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-2xl">🚀</motion.span>
+              <motion.span animate={{ y: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-2xl">🚀</motion.span>
               <div>
-                <p className="text-white font-semibold text-sm">Scroll one more time to morph back to top!</p>
-                <p className="text-gray-400 text-xs mt-0.5">Or scroll up to stay here</p>
+                <p className="text-white font-semibold text-sm">Scroll once more to return to top</p>
+                <p className="text-gray-400 text-xs mt-0.5">Or scroll up to stay</p>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Morph overlay */}
-      {morphing && (
-        <motion.div
-          className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* Liquid morph blobs */}
-          {[0, 1, 2, 3].map((i) => (
-            <motion.div
-              key={`blob-${i}`}
-              className="absolute rounded-full"
-              initial={{
-                scale: 0,
-                x: '50%',
-                y: '50%',
-                opacity: 0.9,
-              }}
-              animate={{
-                scale: [0, 3, 8, 15],
-                x: ['50%', `${20 + i * 20}%`, '50%', '50%'],
-                y: ['50%', `${30 + i * 10}%`, '50%', '50%'],
-                opacity: [0.9, 0.7, 0.4, 0],
-                borderRadius: ['50%', '40% 60% 70% 30%', '60% 40% 30% 70%', '50%'],
-              }}
-              transition={{
-                duration: 2.5,
-                delay: i * 0.15,
-                ease: 'easeInOut',
-              }}
-              style={{
-                width: '300px',
-                height: '300px',
-                background: ['#14b8a6', '#fbbf24', '#a855f7', '#f97316'][i],
-                filter: 'blur(40px)',
-              }}
-            />
-          ))}
-
-          {/* Expanding ripple rings */}
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <motion.div
-              key={`ripple-${i}`}
-              className="absolute rounded-full border-2"
-              initial={{ width: 0, height: 0, opacity: 0.8, left: '50%', top: '50%', x: '-50%', y: '-50%' }}
-              animate={{ width: [0, 3000], height: [0, 3000], opacity: [0.8, 0] }}
-              transition={{ duration: 2, delay: i * 0.3, ease: 'easeOut' }}
-              style={{ borderColor: i % 2 === 0 ? 'rgba(20,184,166,0.4)' : 'rgba(251,191,36,0.3)' }}
-            />
-          ))}
-
-          {/* Center morphing circle */}
+      {/* Curtain wipe overlay */}
+      <AnimatePresence>
+        {active && (
           <motion.div
-            className="absolute left-1/2 top-1/2"
-            initial={{ scale: 0, x: '-50%', y: '-50%' }}
-            animate={{ scale: [0, 1, 1.5, 0], rotate: [0, 90, 180, 360] }}
-            transition={{ duration: 2.5, ease: 'easeInOut' }}
+            className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, delay: 2.5 }}
           >
+            {/* Liquid gradient curtain — wipes from bottom to top */}
             <motion.div
-              animate={{ borderRadius: ['50%', '30% 70% 70% 30%', '70% 30% 30% 70%', '50%'] }}
-              transition={{ duration: 1, repeat: 2.5 }}
-              className="w-32 h-32 flex items-center justify-center"
+              className="absolute inset-0"
+              initial={{ y: '100%' }}
+              animate={{ y: '-100%' }}
+              transition={{ duration: 2, ease: [0.65, 0, 0.35, 1] }}
               style={{
-                background: 'linear-gradient(135deg, #14b8a6, #fbbf24, #a855f7)',
-                boxShadow: '0 0 60px rgba(20,184,166,0.6)',
+                background: 'linear-gradient(180deg, #0a0a0f 0%, #14b8a6 20%, #fbbf24 40%, #a855f7 60%, #f97316 80%, #0a0a0f 100%)',
               }}
             >
-              <motion.span
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 1.5, repeat: 1.5 }}
-                className="text-4xl"
+              {/* Liquid wave edge at top of curtain */}
+              <svg
+                className="absolute top-0 left-0 w-full"
+                style={{ transform: 'translateY(-99%)' }}
+                viewBox="0 0 1440 120"
+                preserveAspectRatio="none"
               >
-                ✨
-              </motion.span>
+                <motion.path
+                  d="M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z"
+                  fill="#0a0a0f"
+                  animate={{
+                    d: [
+                      'M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z',
+                      'M0,40 Q360,100 720,80 T1440,40 L1440,0 L0,0 Z',
+                      'M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z',
+                    ],
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              </svg>
+
+              {/* Center sparkle */}
+              <motion.div
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [0, 1.5, 1, 0], opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 2, ease: 'easeInOut' }}
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: 2, ease: 'linear' }}
+                  className="text-5xl"
+                >
+                  ✨
+                </motion.div>
+              </motion.div>
+
+              {/* Loading dots */}
+              <motion.div
+                className="absolute left-1/2 top-[60%] -translate-x-1/2 flex gap-1.5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 2, times: [0, 0.2, 0.8, 1] }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-white/80"
+                    animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+                    transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                  />
+                ))}
+              </motion.div>
             </motion.div>
           </motion.div>
-
-          {/* Loading text */}
-          <motion.div
-            className="absolute bottom-1/4 left-1/2 -translate-x-1/2 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 2.5, times: [0, 0.2, 0.8, 1] }}
-          >
-            <p className="text-white font-bold text-lg font-mono tracking-widest mb-2">MORPHING TO TOP</p>
-            <div className="flex gap-1 justify-center">
-              {[0, 1, 2].map((i) => (
-                <motion.span
-                  key={i}
-                  className="w-2 h-2 rounded-full bg-teal-400"
-                  animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.2, 0.8] }}
-                  transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
     </>
   )
 }
@@ -1310,16 +1282,6 @@ export default function Home() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-600 text-sm font-mono"
-        >
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
-            <ArrowDown className="w-5 h-5" />
-          </motion.div>
-        </motion.div>
       </motion.section>
 
       {/* ============ AI AGENTS SECTION — HOLOGRAPHIC ============ */}
