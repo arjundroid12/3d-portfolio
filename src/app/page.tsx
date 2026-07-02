@@ -93,9 +93,8 @@ function useSoundEffects() {
     setTimeout(() => playTone(1047, 0.2, 'sine', 0.04), 240)
   }, [playTone])
 
-  // ============ GENTLE MELODY MUSIC ============
+  // ============ SIMPLE AMBIENT MUSIC ============
   const musicNodesRef = useRef<any>(null)
-  const musicIntervalRef = useRef<any>(null)
 
   const startMusic = useCallback(() => {
     if (musicNodesRef.current) return
@@ -103,61 +102,26 @@ function useSoundEffects() {
       const ctx = getCtx()
       const masterGain = ctx.createGain()
       masterGain.gain.setValueAtTime(0, ctx.currentTime)
-      masterGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 2)
+      masterGain.gain.linearRampToValueAtTime(0.025, ctx.currentTime + 2)
       masterGain.connect(ctx.destination)
 
-      musicNodesRef.current = { masterGain, ctx }
+      // Single sustained chord — C major (C3 + E3 + G3)
+      const freqs = [130.81, 164.81, 196.00]
+      const oscillators: any[] = []
 
-      // Soft arpeggio — C major pentatonic, music-box style
-      const notes = [
-        523.25, 587.33, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33, // C5 D5 E5 G5 A5 G5 E5 D5
-        523.25, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33, 523.25, // C5 E5 G5 A5 G5 E5 D5 C5
-      ]
-      let noteIndex = 0
+      freqs.forEach((freq, i) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.value = freq
+        gain.gain.value = 0.33
+        osc.connect(gain)
+        gain.connect(masterGain)
+        osc.start()
+        oscillators.push(osc)
+      })
 
-      const playNote = () => {
-        if (!musicNodesRef.current) return
-        const freq = notes[noteIndex]
-        const now = ctx.currentTime
-
-        // Soft bell tone — two oscillators (fundamental + octave)
-        const osc1 = ctx.createOscillator()
-        const osc2 = ctx.createOscillator()
-        const gain1 = ctx.createGain()
-        const gain2 = ctx.createGain()
-
-        osc1.type = 'sine'
-        osc1.frequency.value = freq
-        osc2.type = 'sine'
-        osc2.frequency.value = freq * 2
-
-        // Soft attack + long decay = bell-like
-        gain1.gain.setValueAtTime(0, now)
-        gain1.gain.linearRampToValueAtTime(0.12, now + 0.02)
-        gain1.gain.exponentialRampToValueAtTime(0.001, now + 2.5)
-
-        gain2.gain.setValueAtTime(0, now)
-        gain2.gain.linearRampToValueAtTime(0.04, now + 0.02)
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.5)
-
-        osc1.connect(gain1)
-        osc2.connect(gain2)
-        gain1.connect(masterGain)
-        gain2.connect(masterGain)
-
-        osc1.start(now)
-        osc1.stop(now + 3)
-        osc2.start(now)
-        osc2.stop(now + 2)
-
-        noteIndex = (noteIndex + 1) % notes.length
-      }
-
-      // Play first note immediately, then every 1.2 seconds
-      playNote()
-      musicIntervalRef.current = setInterval(playNote, 1200)
-
-      musicNodesRef.current = { masterGain, ctx, interval: musicIntervalRef.current }
+      musicNodesRef.current = { masterGain, oscillators }
     } catch {}
   }, [getCtx])
 
@@ -166,12 +130,9 @@ function useSoundEffects() {
     try {
       const ctx = getCtx()
       musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1)
-      if (musicIntervalRef.current) {
-        clearInterval(musicIntervalRef.current)
-        musicIntervalRef.current = null
-      }
       setTimeout(() => {
         try {
+          musicNodesRef.current?.oscillators.forEach((osc: any) => osc.stop())
           musicNodesRef.current?.masterGain.disconnect()
         } catch {}
         musicNodesRef.current = null
@@ -179,36 +140,26 @@ function useSoundEffects() {
     } catch {}
   }, [getCtx])
 
-  // ============ TAB VISIBILITY — pause/resume audio ============
+  // ============ TAB VISIBILITY ============
   useEffect(() => {
     const handleVisibility = () => {
-      if (document.hidden) {
-        if (musicNodesRef.current) {
-          try {
-            const ctx = getCtx()
-            musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5)
-          } catch {}
+      if (!musicNodesRef.current) return
+      try {
+        const ctx = getCtx()
+        if (document.hidden) {
+          musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5)
+        } else if (enabled) {
+          musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0.025, ctx.currentTime + 1)
         }
-      } else {
-        if (musicNodesRef.current && enabled) {
-          try {
-            const ctx = getCtx()
-            musicNodesRef.current.masterGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 1)
-          } catch {}
-        }
-      }
+      } catch {}
     }
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [enabled, getCtx])
 
-  // Start/stop music based on enabled state
   useEffect(() => {
-    if (enabled) {
-      startMusic()
-    } else {
-      stopMusic()
-    }
+    if (enabled) startMusic()
+    else stopMusic()
   }, [enabled, startMusic, stopMusic])
 
   return { enabled, setEnabled, playHover, playClick, playModalOpen, playModalClose, playNavHover, playFilter, playScroll, playWarp, playPop, playSuccess }
@@ -618,13 +569,13 @@ function FunPopups({ enabled }: { enabled: boolean }) {
   )
 }
 
-// ============ SCROLL WARP (with confirmation popup) ============
+// ============ MORPH TRANSITION (bottom → hero) ============
 
-function ScrollWarp({ onWarp, onConfirm }: { onWarp: () => void; onConfirm?: () => void }) {
-  const [warping, setWarping] = useState(false)
+function MorphTransition({ onMorph }: { onMorph: () => void }) {
+  const [morphing, setMorphing] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const lastScrollY = useRef(0)
-  const warpTriggered = useRef(false)
+  const morphTriggered = useRef(false)
   const confirmDismissTimer = useRef<any>(null)
   const atBottomRef = useRef(false)
 
@@ -637,40 +588,36 @@ function ScrollWarp({ onWarp, onConfirm }: { onWarp: () => void; onConfirm?: () 
       const scrollingDown = scrollY > lastScrollY.current
       lastScrollY.current = scrollY
 
-      if (atBottom && scrollingDown && !warpTriggered.current) {
+      if (atBottom && scrollingDown && !morphTriggered.current) {
         if (!atBottomRef.current) {
-          // First time reaching bottom — show confirmation
           atBottomRef.current = true
           setShowConfirm(true)
-          onConfirm?.()
+          onMorph?.('confirm')
 
-          // Auto-dismiss after 5 seconds if they don't scroll again
           confirmDismissTimer.current = setTimeout(() => {
             setShowConfirm(false)
             atBottomRef.current = false
           }, 5000)
         } else {
-          // Second scroll at bottom — trigger warp!
           clearTimeout(confirmDismissTimer.current)
           setShowConfirm(false)
-          warpTriggered.current = true
-          setWarping(true)
-          onWarp()
-          // Wait 2.5s for the warp animation to build up, THEN scroll
+          morphTriggered.current = true
+          setMorphing(true)
+          onMorph?.('warp')
+
+          // Wait 2.5s for the morph to play, then scroll
           setTimeout(() => {
             window.scrollTo({ top: 0, behavior: 'smooth' })
           }, 2500)
-          // Keep overlay visible during scroll + fade out
           setTimeout(() => {
-            setWarping(false)
-            warpTriggered.current = false
+            setMorphing(false)
+            morphTriggered.current = false
             atBottomRef.current = false
           }, 4500)
         }
       }
 
-      // If user scrolls up, dismiss confirmation
-      if (!atBottom && atBottomRef.current && !warpTriggered.current) {
+      if (!atBottom && atBottomRef.current && !morphTriggered.current) {
         clearTimeout(confirmDismissTimer.current)
         setShowConfirm(false)
         atBottomRef.current = false
@@ -679,144 +626,129 @@ function ScrollWarp({ onWarp, onConfirm }: { onWarp: () => void; onConfirm?: () 
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [onWarp])
+  }, [onMorph])
 
   return (
     <>
       {/* Confirmation popup */}
       <AnimatePresence>
-        {showConfirm && !warping && (
+        {showConfirm && !morphing && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.8 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-4 bg-white/10 backdrop-blur-xl border border-teal-500/30 rounded-2xl shadow-2xl pointer-events-none"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-4 liquid-glass border border-teal-500/30 rounded-2xl shadow-2xl pointer-events-none"
           >
             <div className="flex items-center gap-3">
-              <motion.span
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="text-2xl"
-              >
-                🚀
-              </motion.span>
+              <motion.span animate={{ y: [0, -5, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-2xl">🚀</motion.span>
               <div>
-                <p className="text-white font-semibold text-sm">
-                  Scroll one more time to fly to the top!
-                </p>
-                <p className="text-gray-400 text-xs mt-0.5">
-                  Or scroll up to stay here
-                </p>
+                <p className="text-white font-semibold text-sm">Scroll one more time to morph back to top!</p>
+                <p className="text-gray-400 text-xs mt-0.5">Or scroll up to stay here</p>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Warp overlay */}
-      {warping && (
+      {/* Morph overlay */}
+      {morphing && (
         <motion.div
+          className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center overflow-hidden"
         >
-      {/* Dark backdrop that fades in */}
-      <motion.div
-        className="absolute inset-0 bg-black"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.9 }}
-        transition={{ duration: 0.4 }}
-      />
-      
-      {/* Expanding portal rings — staggered for depth */}
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-        <motion.div
-          key={`ring-${i}`}
-          className="absolute rounded-full"
-          initial={{ width: 0, height: 0, opacity: 0, borderWidth: 4 }}
-          animate={{ width: [0, 2500], height: [0, 2500], opacity: [0, 0.6, 0] }}
-          transition={{ duration: 2, delay: i * 0.2, ease: 'easeOut', repeat: 1 }}
-          style={{
-            borderStyle: 'solid',
-            borderColor: i % 2 === 0 ? 'rgba(20, 184, 166, 0.5)' : 'rgba(251, 191, 36, 0.4)',
-          }}
-        />
-      ))}
-
-      {/* Starburst streaks emanating from center */}
-      {Array.from({ length: 16 }).map((_, i) => {
-        const angle = (i / 16) * 360
-        return (
-          <motion.div
-            key={`streak-${i}`}
-            className="absolute"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: [0, 0.8, 0], scale: [0, 1, 1.5] }}
-            transition={{ duration: 1.5, delay: 0.2 + i * 0.03, ease: 'easeOut' }}
-            style={{
-              width: '2px',
-              height: '100vh',
-              background: `linear-gradient(to bottom, transparent 0%, ${
-                i % 3 === 0 ? 'rgba(20, 184, 166, 0.8)' : i % 3 === 1 ? 'rgba(251, 191, 36, 0.6)' : 'rgba(168, 85, 247, 0.5)'
-              } 50%, transparent 100%)`,
-              transformOrigin: 'center',
-              transform: `rotate(${angle}deg)`,
-            }}
-          />
-        )
-      })}
-
-      {/* Center portal glow */}
-      <motion.div
-        className="absolute rounded-full"
-        initial={{ width: 0, height: 0 }}
-        animate={{ width: [0, 400, 0], height: [0, 400, 0] }}
-        transition={{ duration: 2, repeat: 1, ease: 'easeInOut' }}
-        style={{
-          background: 'radial-gradient(circle, rgba(20,184,166,0.6), rgba(251,191,36,0.3), transparent 70%)',
-          filter: 'blur(20px)',
-        }}
-      />
-
-      {/* Center content — spinning portal emoji */}
-      <motion.div
-        initial={{ scale: 0, rotate: 0 }}
-        animate={{ scale: [0, 1.2, 1, 1.2, 0], rotate: [0, 180, 360, 540, 720] }}
-        transition={{ duration: 2.5, ease: 'easeInOut' }}
-        className="relative z-10 text-center"
-      >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: 3, ease: 'linear' }}
-          className="text-7xl mb-3"
-        >
-          🌌
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ duration: 2.5, times: [0, 0.2, 0.8, 1] }}
-          className="text-white font-bold text-lg font-mono tracking-widest"
-        >
-          WARPING TO TOP...
-        </motion.p>
-        <motion.div
-          className="mt-2 flex gap-1 justify-center"
-        >
-          {[0, 1, 2].map((i) => (
-            <motion.span
-              key={i}
-              className="w-2 h-2 rounded-full bg-teal-400"
-              animate={{ opacity: [0.2, 1, 0.2] }}
-              transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+          {/* Liquid morph blobs */}
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={`blob-${i}`}
+              className="absolute rounded-full"
+              initial={{
+                scale: 0,
+                x: '50%',
+                y: '50%',
+                opacity: 0.9,
+              }}
+              animate={{
+                scale: [0, 3, 8, 15],
+                x: ['50%', `${20 + i * 20}%`, '50%', '50%'],
+                y: ['50%', `${30 + i * 10}%`, '50%', '50%'],
+                opacity: [0.9, 0.7, 0.4, 0],
+                borderRadius: ['50%', '40% 60% 70% 30%', '60% 40% 30% 70%', '50%'],
+              }}
+              transition={{
+                duration: 2.5,
+                delay: i * 0.15,
+                ease: 'easeInOut',
+              }}
+              style={{
+                width: '300px',
+                height: '300px',
+                background: ['#14b8a6', '#fbbf24', '#a855f7', '#f97316'][i],
+                filter: 'blur(40px)',
+              }}
             />
           ))}
+
+          {/* Expanding ripple rings */}
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <motion.div
+              key={`ripple-${i}`}
+              className="absolute rounded-full border-2"
+              initial={{ width: 0, height: 0, opacity: 0.8, left: '50%', top: '50%', x: '-50%', y: '-50%' }}
+              animate={{ width: [0, 3000], height: [0, 3000], opacity: [0.8, 0] }}
+              transition={{ duration: 2, delay: i * 0.3, ease: 'easeOut' }}
+              style={{ borderColor: i % 2 === 0 ? 'rgba(20,184,166,0.4)' : 'rgba(251,191,36,0.3)' }}
+            />
+          ))}
+
+          {/* Center morphing circle */}
+          <motion.div
+            className="absolute left-1/2 top-1/2"
+            initial={{ scale: 0, x: '-50%', y: '-50%' }}
+            animate={{ scale: [0, 1, 1.5, 0], rotate: [0, 90, 180, 360] }}
+            transition={{ duration: 2.5, ease: 'easeInOut' }}
+          >
+            <motion.div
+              animate={{ borderRadius: ['50%', '30% 70% 70% 30%', '70% 30% 30% 70%', '50%'] }}
+              transition={{ duration: 1, repeat: 2.5 }}
+              className="w-32 h-32 flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #14b8a6, #fbbf24, #a855f7)',
+                boxShadow: '0 0 60px rgba(20,184,166,0.6)',
+              }}
+            >
+              <motion.span
+                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
+                transition={{ duration: 1.5, repeat: 1.5 }}
+                className="text-4xl"
+              >
+                ✨
+              </motion.span>
+            </motion.div>
+          </motion.div>
+
+          {/* Loading text */}
+          <motion.div
+            className="absolute bottom-1/4 left-1/2 -translate-x-1/2 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 2.5, times: [0, 0.2, 0.8, 1] }}
+          >
+            <p className="text-white font-bold text-lg font-mono tracking-widest mb-2">MORPHING TO TOP</p>
+            <div className="flex gap-1 justify-center">
+              {[0, 1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-teal-400"
+                  animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.2, 0.8] }}
+                  transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                />
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </motion.div>
       )}
     </>
   )
@@ -1121,7 +1053,7 @@ export default function Home() {
 
       {/* ============ SCROLL WARP OVERLAY ============ */}
       <AnimatePresence>
-        <ScrollWarp onWarp={() => { sound.playWarp() }} onConfirm={() => sound.playPop()} />
+        <MorphTransition onMorph={(type) => { if (type === 'warp') sound.playWarp(); else sound.playPop() }} />
       </AnimatePresence>
 
       {/* ============ DYNAMIC COLOR AURORA BACKGROUND ============ */}
