@@ -54,8 +54,41 @@ function useSoundEffects() {
     playTone(880, 0.1, 'sine', 0.04)
     setTimeout(() => playTone(440, 0.15, 'sine', 0.03), 80)
   }, [playTone])
+  const playNavHover = useCallback(() => playTone(1200, 0.03, 'sine', 0.02), [playTone])
+  const playFilter = useCallback(() => {
+    playTone(659, 0.06, 'triangle', 0.04)
+    setTimeout(() => playTone(880, 0.06, 'triangle', 0.03), 40)
+  }, [playTone])
+  const playScroll = useCallback(() => playTone(300, 0.08, 'sine', 0.015), [playTone])
+  const playWarp = useCallback(() => {
+    // Cool warp/zoom sound — descending sweep
+    const ctx = getCtx()
+    try {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'sawtooth'
+      osc.frequency.setValueAtTime(1200, ctx.currentTime)
+      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.6)
+      gain.gain.setValueAtTime(0.06, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.6)
+    } catch {}
+  }, [getCtx])
+  const playPop = useCallback(() => {
+    playTone(1047, 0.04, 'sine', 0.04)
+    setTimeout(() => playTone(1319, 0.06, 'sine', 0.03), 30)
+  }, [playTone])
+  const playSuccess = useCallback(() => {
+    playTone(523, 0.08, 'sine', 0.05)
+    setTimeout(() => playTone(659, 0.08, 'sine', 0.05), 80)
+    setTimeout(() => playTone(784, 0.08, 'sine', 0.05), 160)
+    setTimeout(() => playTone(1047, 0.2, 'sine', 0.04), 240)
+  }, [playTone])
 
-  return { enabled, setEnabled, playHover, playClick, playModalOpen, playModalClose }
+  return { enabled, setEnabled, playHover, playClick, playModalOpen, playModalClose, playNavHover, playFilter, playScroll, playWarp, playPop, playSuccess }
 }
 
 // ============ 3D SCENE COMPONENTS ============
@@ -311,6 +344,165 @@ function GradientText({ children, className = '' }: { children: React.ReactNode;
   )
 }
 
+// ============ FUN POPUP COMMENTS ============
+
+const FUN_MESSAGES = [
+  { text: "Nice scrolling! 👀", emoji: "👀" },
+  { text: "You're crushing it! 💪", emoji: "💪" },
+  { text: "Check out my AI agents! 🤖", emoji: "🤖" },
+  { text: "Did you know I built 4 AI agents? 😎", emoji: "😎" },
+  { text: "Love that you're exploring! ✨", emoji: "✨" },
+  { text: "Almost there... 🔥", emoji: "🔥" },
+  { text: "Pro tip: Click the cards! 👆", emoji: "👆" },
+  { text: "I see you scrolling 🎢", emoji: "🎢" },
+  { text: "Nice taste in portfolios! 😏", emoji: "😏" },
+  { text: "Don't forget to say hi! 👋", emoji: "👋" },
+  { text: "Built with Three.js + Framer Motion ⚡", emoji: "⚡" },
+  { text: "Sound on? 🔊", emoji: "🔊" },
+  { text: "Scroll to the bottom for a surprise! 🎁", emoji: "🎁" },
+  { text: "You found me! 🎉", emoji: "🎉" },
+  { text: "Keep going, you're doing great! 🚀", emoji: "🚀" },
+]
+
+function FunPopups({ enabled }: { enabled: boolean }) {
+  const [popups, setPopups] = useState<Array<{ id: number; text: string; emoji: string; x: number; y: number }>>([])
+  const idRef = useRef(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!enabled) return
+      const msg = FUN_MESSAGES[Math.floor(Math.random() * FUN_MESSAGES.length)]
+      const id = idRef.current++
+      const x = 10 + Math.random() * 80
+      const y = 15 + Math.random() * 60
+      setPopups((prev) => [...prev, { id, ...msg, x, y }])
+      setTimeout(() => {
+        setPopups((prev) => prev.filter((p) => p.id !== id))
+      }, 4000)
+    }, 12000) // Every 12 seconds
+
+    return () => clearInterval(interval)
+  }, [enabled])
+
+  return (
+    <div className="fixed inset-0 z-[90] pointer-events-none">
+      <AnimatePresence>
+        {popups.map((popup) => (
+          <motion.div
+            key={popup.id}
+            initial={{ opacity: 0, scale: 0, rotate: -10, y: 20 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
+            exit={{ opacity: 0, scale: 0, rotate: 10, y: -20 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            style={{
+              position: 'absolute',
+              left: `${popup.x}%`,
+              top: `${popup.y}%`,
+            }}
+            className="px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl"
+          >
+            <span className="text-lg mr-1">{popup.emoji}</span>
+            <span className="text-sm font-medium text-white">{popup.text}</span>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============ SCROLL WARP (scroll past bottom → back to hero) ============
+
+function ScrollWarp({ onWarp }: { onWarp: () => void }) {
+  const [warping, setWarping] = useState(false)
+  const lastScrollY = useRef(0)
+  const warpTriggered = useRef(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const windowHeight = window.innerHeight
+      const docHeight = document.documentElement.scrollHeight
+      const atBottom = scrollY + windowHeight >= docHeight - 50
+      const scrollingDown = scrollY > lastScrollY.current
+      lastScrollY.current = scrollY
+
+      if (atBottom && scrollingDown && !warpTriggered.current) {
+        warpTriggered.current = true
+        setWarping(true)
+        onWarp()
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }, 400)
+        setTimeout(() => {
+          setWarping(false)
+          warpTriggered.current = false
+        }, 2000)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [onWarp])
+
+  if (!warping) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
+    >
+      {/* Warp tunnel effect */}
+      <motion.div
+        className="absolute inset-0"
+        animate={{
+          background: [
+            'radial-gradient(circle at center, transparent 0%, rgba(99,102,241,0.3) 30%, rgba(168,85,247,0.6) 60%, rgba(0,0,0,1) 100%)',
+            'radial-gradient(circle at center, transparent 0%, rgba(168,85,247,0.4) 20%, rgba(236,72,153,0.7) 40%, rgba(0,0,0,1) 70%)',
+            'radial-gradient(circle at center, transparent 0%, rgba(99,102,241,0.3) 30%, rgba(168,85,247,0.6) 60%, rgba(0,0,0,1) 100%)',
+          ],
+        }}
+        transition={{ duration: 0.8, repeat: 2 }}
+      />
+      {/* Zooming circles */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border-2 border-white/30"
+          initial={{ width: 0, height: 0, opacity: 0.8 }}
+          animate={{ width: 2000, height: 2000, opacity: 0 }}
+          transition={{ duration: 0.8, delay: i * 0.1, repeat: 2, ease: 'easeOut' }}
+          style={{ borderStyle: 'dashed' }}
+        />
+      ))}
+      {/* Center text */}
+      <motion.div
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        className="relative z-10 text-center"
+      >
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.8, repeat: 2, ease: 'linear' }}
+          className="text-6xl mb-2"
+        >
+          🌀
+        </motion.div>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-white font-bold text-lg font-mono"
+        >
+          WARPING BACK TO TOP...
+        </motion.p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 // ============ 3D TILT CARD COMPONENT ============
 
 function TiltCard({ project, onClick, onHover }: { project: any; onClick: () => void; onHover?: () => void }) {
@@ -425,6 +617,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
+      {/* ============ FUN POPUPS ============ */}
+      <FunPopups enabled={sound.enabled} />
+
+      {/* ============ SCROLL WARP OVERLAY ============ */}
+      <AnimatePresence>
+        <ScrollWarp onWarp={() => { sound.playWarp() }} />
+      </AnimatePresence>
+
       {/* ============ DYNAMIC COLOR AURORA BACKGROUND ============ */}
       <motion.div
         className="fixed inset-0 z-0 pointer-events-none"
@@ -506,12 +706,14 @@ export default function Home() {
                 key={item}
                 href={`#${item.toLowerCase()}`}
                 whileHover={{ scale: 1.05, y: -2 }}
+                onMouseEnter={() => sound.playNavHover()}
+                onClick={() => sound.playClick()}
                 className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
               >
                 {item}
               </motion.a>
             ))}
-            <Button size="sm" variant="outline" className="ml-2 border-white/20 bg-white/5 text-white hover:bg-white/10" asChild>
+            <Button size="sm" variant="outline" className="ml-2 border-white/20 bg-white/5 text-white hover:bg-white/10" asChild onMouseEnter={() => sound.playNavHover()} onClick={() => sound.playClick()}>
               <a href="https://github.com/arjundroid12" target="_blank" rel="noopener">
                 <Github className="w-4 h-4 mr-2" /> GitHub
               </a>
@@ -709,6 +911,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
+                onMouseEnter={() => sound.playPop()}
               >
                 <Card className="relative overflow-hidden bg-white/[0.03] backdrop-blur-xl border-white/10 hover:border-white/20 transition-all duration-300 h-full">
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${agent.gradient}`} />
@@ -804,7 +1007,8 @@ export default function Home() {
                 key={cat}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveFilter(cat)}
+                onClick={() => { setActiveFilter(cat); sound.playFilter() }}
+                onMouseEnter={() => sound.playNavHover()}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   activeFilter === cat
                     ? 'bg-indigo-500 text-white'
@@ -895,6 +1099,7 @@ export default function Home() {
                         <motion.span
                           key={skill}
                           whileHover={{ scale: 1.1, y: -2 }}
+                          onMouseEnter={() => sound.playPop()}
                           className="px-3 py-1 text-sm bg-white/5 border border-white/10 rounded-lg font-mono text-gray-300 cursor-default"
                         >
                           {skill}
@@ -942,6 +1147,8 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -6, scale: 1.03 }}
+                onMouseEnter={() => sound.playPop()}
+                onClick={() => sound.playClick()}
               >
                 <Card className="bg-white/[0.03] backdrop-blur-xl border-white/10 hover:border-indigo-500/30 transition-all text-center h-full">
                   <CardContent className="pt-6 pb-4">
@@ -963,8 +1170,8 @@ export default function Home() {
               <Sparkles className="w-8 h-8 mx-auto mb-4 text-purple-400" />
               <h3 className="text-xl font-bold mb-3">Have a project in mind?</h3>
               <p className="text-gray-500 mb-6">I'm always interested in hearing about new ideas and AI collaborations.</p>
-              <Button size="lg" className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 border-0" asChild>
-                <a href="mailto:arjunvashishtha2004@gmail.com">
+              <Button size="lg" className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 border-0" asChild onClick={() => sound.playSuccess()}>
+                <a href="mailto:arjunvashishtha2004@gmail.com" onMouseEnter={() => sound.playHover()}>
                   <Mail className="w-4 h-4 mr-2" /> Send me an email
                 </a>
               </Button>
@@ -979,6 +1186,14 @@ export default function Home() {
           <p className="text-gray-600 text-sm font-mono">
             Built with Next.js · Three.js · Framer Motion · © {new Date().getFullYear()} Arjun Vashishtha
           </p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-indigo-400/60 text-xs font-mono mt-2"
+          >
+            💡 Scroll past the bottom for a surprise...
+          </motion.p>
         </div>
       </footer>
 
