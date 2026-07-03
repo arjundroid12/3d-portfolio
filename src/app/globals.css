@@ -6,8 +6,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-mono: var(--font-mono), "JetBrains Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -118,7 +119,42 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
   }
+  /* All headings use premium serif (Playfair Display) */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ============ PREMIUM WHITE TYPOGRAPHY ============ */
+body, p, span, a, li, button, input, textarea, select, label, div {
+  color: #ffffff;
+}
+
+/* Subtle opacity for secondary/muted text — premium white-on-dark */
+.text-muted, .text-secondary,
+[class*="text-gray-300"], [class*="text-gray-400"],
+[class*="text-zinc-300"], [class*="text-zinc-400"] {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[class*="text-gray-500"], [class*="text-gray-600"],
+[class*="text-zinc-500"], [class*="text-zinc-600"] {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Premium serif utility classes */
+.font-serif {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+}
+
+.font-display {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+  letter-spacing: -0.025em;
+  font-weight: 700;
 }
 
 /* ============ LIQUID GLASS UI ============ */
@@ -136,10 +172,10 @@
 
 .liquid-glass:hover {
   background: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(20, 184, 166, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(20, 184, 166, 0.1),
+    0 0 20px rgba(255, 255, 255, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
