@@ -1168,16 +1168,17 @@ export default function Home() {
             >
               <div className="w-full h-full rounded-full bg-[#0a0a0f]" />
             </motion.div>
-            {/* Inner photo placeholder */}
-            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-teal-500/20 to-amber-500/20 backdrop-blur-xl border border-white/10 flex items-center justify-center overflow-hidden">
-              {/* Replace this div with <img src="/photo.jpg" /> when you have your photo */}
-              <motion.div
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="text-5xl"
-              >
-                👨‍💻
-              </motion.div>
+            {/* Inner photo */}
+            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-teal-500/20 to-amber-500/20 backdrop-blur-xl border border-white/10 overflow-hidden">
+              <motion.img
+                src="/photo.jpg"
+                alt="Arjun Vashishtha"
+                initial={{ scale: 1.15, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: 'center top' }}
+              />
             </div>
             {/* Pulsing glow */}
             <motion.div
