@@ -1170,6 +1170,136 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
   )
 }
 
+// ============ HORIZONTAL PINNED SCROLL SHOWCASE ============
+// Vertical scroll → horizontal card movement (Lenis-style).
+// Section is pinned while cards slide from right to left.
+
+function HorizontalShowcase() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    const track = trackRef.current
+    if (!section || !track) return
+
+    const handleScroll = () => {
+      const rect = section.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      // Section is pinned from when its top hits top of viewport
+      // until its bottom passes bottom of viewport.
+      const sectionHeight = section.offsetHeight
+      const scrollable = sectionHeight - windowHeight
+      // How far we've scrolled into the pinned section (0 → 1)
+      const scrolled = Math.max(0, Math.min(scrollable, -rect.top))
+      const p = scrollable > 0 ? scrolled / scrollable : 0
+      setProgress(p)
+
+      // Translate the track horizontally
+      const trackWidth = track.scrollWidth - window.innerWidth
+      if (trackWidth > 0) {
+        const x = -p * trackWidth
+        track.style.transform = `translate3d(${x}px, 0, 0)`
+      }
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const showcaseCards = [
+    { title: 'AI Research Agent', subtitle: 'Autonomous • LLMs • RAG', bg: 'linear-gradient(135deg, #8A2BE2, #4B0082)', accent: '#C8A2FF' },
+    { title: 'Gesture Particle Painter', subtitle: 'MediaPipe • WebGL • CV', bg: 'linear-gradient(135deg, #14b8a6, #047857)', accent: '#5eead4' },
+    { title: 'Premium Portfolio Suite', subtitle: 'Three.js • Framer • Sound', bg: 'linear-gradient(135deg, #fbbf24, #d97706)', accent: '#fde68a' },
+    { title: 'Realtime Chat', subtitle: 'WebSocket • Socket.io', bg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', accent: '#93c5fd' },
+    { title: 'Movie Explorer', subtitle: 'OMDB • React • Tailwind', bg: 'linear-gradient(135deg, #ef4444, #b91c1c)', accent: '#fca5a5' },
+    { title: 'SmartAgro', subtitle: 'CNN • Plant Disease ML', bg: 'linear-gradient(135deg, #22c55e, #15803d)', accent: '#86efac' },
+    { title: 'FIOLA Voice App', subtitle: 'Web Speech API • NLP', bg: 'linear-gradient(135deg, #ec4899, #be185d)', accent: '#f9a8d4' },
+  ]
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative z-10"
+      style={{ height: `${showcaseCards.length * 80}vh` }}
+    >
+      {/* Sticky container — stays pinned while track scrolls horizontally */}
+      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
+        {/* Section heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="absolute top-20 left-0 right-0 text-center z-20 pointer-events-none"
+        >
+          <Badge variant="secondary" className="mb-3 bg-purple-500/10 text-purple-300 border-purple-500/30 font-mono">{"// showcase"}</Badge>
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>
+            Selected Work
+          </h2>
+          <p className="text-white/40 text-sm mt-2">Scroll to explore →</p>
+        </motion.div>
+
+        {/* Horizontal track */}
+        <div
+          ref={trackRef}
+          className="flex gap-6 px-6 will-change-transform"
+          style={{ width: 'max-content' }}
+        >
+          {showcaseCards.map((card, i) => (
+            <div
+              key={i}
+              className="relative shrink-0 w-[80vw] md:w-[50vw] lg:w-[40vw] h-[60vh] rounded-3xl overflow-hidden flex flex-col justify-end p-10"
+              style={{
+                background: card.bg,
+                boxShadow: '0 25px 80px rgba(0,0,0,0.5)',
+              }}
+            >
+              {/* Glow accent */}
+              <div
+                className="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl opacity-40"
+                style={{ background: card.accent }}
+              />
+
+              {/* Card number */}
+              <div className="absolute top-8 right-8 text-white/40 text-sm font-mono">
+                {String(i + 1).padStart(2, '0')} / {String(showcaseCards.length).padStart(2, '0')}
+              </div>
+
+              {/* Content */}
+              <div className="relative z-10">
+                <p className="text-white/70 text-xs uppercase tracking-[0.3em] mb-3">{card.subtitle}</p>
+                <h3
+                  className="text-white text-3xl md:text-4xl font-bold mb-4"
+                  style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
+                >
+                  {card.title}
+                </h3>
+                <div className="flex items-center gap-2 text-white/80 text-sm">
+                  <span>View case study</span>
+                  <span>→</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Progress bar */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-none"
+            style={{
+              width: `${progress * 100}%`,
+              background: 'linear-gradient(90deg, #8A2BE2, #14b8a6, #fbbf24)',
+            }}
+          />
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ============ MAIN PAGE ============
 
 export default function Home() {
@@ -1644,6 +1774,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ============ HORIZONTAL PINNED SHOWCASE ============ */}
+      <HorizontalShowcase />
 
       {/* ============ ABOUT SECTION ============ */}
       <section id="about" className="relative z-10 py-24 px-6">
