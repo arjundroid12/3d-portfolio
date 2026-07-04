@@ -1055,7 +1055,8 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
 }
 
 // ============ MINIMAL SPLASH SCREEN ============
-// White background, purple "ARJUN" wordmark, click to enter.
+// Premium blackish-purple background, white "ARJUN" wordmark.
+// Slide-up entrance, super-zoom-into-text exit transition.
 
 function SplashScreen({ onEnter }: { onEnter: () => void }) {
   const [leaving, setLeaving] = useState(false)
@@ -1063,48 +1064,59 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
   const handleClick = () => {
     if (leaving) return
     setLeaving(true)
-    // Wait for exit animation, then notify parent
-    setTimeout(onEnter, 900)
+    // Wait for the super-zoom exit to peak, then reveal hero
+    setTimeout(onEnter, 1100)
   }
 
   return (
     <motion.div
-      className="fixed inset-0 z-[500] flex items-center justify-center cursor-pointer"
+      className="fixed inset-0 z-[500] flex items-center justify-center cursor-pointer overflow-hidden"
       onClick={handleClick}
       initial={{ opacity: 1 }}
       animate={{ opacity: leaving ? 0 : 1 }}
-      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-      style={{ background: '#ffffff' }}
+      // Hold opacity at 1 through the zoom, then fade out at the very end
+      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1], delay: leaving ? 0.9 : 0 }}
+      style={{
+        // Premium blackish-purple: deep purple-black with subtle purple tint
+        background: 'radial-gradient(circle at 50% 50%, #1a0a2e 0%, #0d0418 60%, #06020d 100%)',
+      }}
     >
-      {/* Subtle radial glow behind the name */}
+      {/* Subtle purple ambient glow behind the name */}
       <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
+        className="absolute w-[700px] h-[700px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(138, 43, 226, 0.08), transparent 70%)',
+          background: 'radial-gradient(circle, rgba(138, 43, 226, 0.18), transparent 70%)',
         }}
-        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
+        animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* The wordmark */}
+      {/* The wordmark — slides up on entrance, super-zooms on exit */}
       <motion.div
         className="relative flex items-start"
-        initial={{ opacity: 0, y: 30, letterSpacing: '0.5em' }}
-        animate={{
-          opacity: leaving ? 0 : 1,
-          y: leaving ? -20 : 0,
-          letterSpacing: leaving ? '0.2em' : '0.05em',
-        }}
-        transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}
+        initial={{ opacity: 0, y: 120 }}
+        animate={
+          leaving
+            ? // EXIT: super zoom into the text — scale way up and fade
+              { opacity: 0, y: 0, scale: 18 }
+            : // ENTER: slide up from below
+              { opacity: 1, y: 0, scale: 1 }
+        }
+        transition={
+          leaving
+            ? { duration: 1.0, ease: [0.7, 0, 0.84, 0], opacity: { duration: 0.9, delay: 0.1 } }
+            : { duration: 1.0, ease: [0.22, 1, 0.36, 1], delay: 0.15 }
+        }
       >
         <motion.h1
           className="font-bold select-none"
           style={{
             fontFamily: 'var(--font-playfair), Georgia, serif',
-            color: '#8A2BE2',
+            color: '#ffffff',
             fontSize: 'clamp(56px, 12vw, 160px)',
             lineHeight: 1,
             letterSpacing: '0.05em',
+            textShadow: '0 0 60px rgba(138, 43, 226, 0.4)',
           }}
         >
           ARJUN
@@ -1113,13 +1125,13 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
         <motion.span
           className="text-sm font-medium mt-3 ml-1"
           style={{
-            color: '#8A2BE2',
-            opacity: 0.6,
+            color: '#ffffff',
+            opacity: 0.5,
             fontFamily: 'var(--font-inter), sans-serif',
           }}
           initial={{ opacity: 0 }}
-          animate={{ opacity: leaving ? 0 : 0.6 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
+          animate={{ opacity: leaving ? 0 : 0.5 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
         >
           ®
         </motion.span>
@@ -1128,13 +1140,13 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
       {/* "Click to enter" hint at bottom */}
       <motion.div
         className="absolute bottom-12 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: leaving ? 0 : [0, 0.5, 0] }}
-        transition={{ delay: 1, duration: 2.5, repeat: Infinity }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: leaving ? 0 : [0, 0.6, 0], y: leaving ? 0 : 0 }}
+        transition={{ delay: 1.1, duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
       >
         <span
           className="text-xs uppercase tracking-[0.4em] font-medium"
-          style={{ color: '#8A2BE2', fontFamily: 'var(--font-inter), sans-serif' }}
+          style={{ color: '#ffffff', fontFamily: 'var(--font-inter), sans-serif' }}
         >
           Click to enter
         </span>
