@@ -602,7 +602,7 @@ function FunPopups({ enabled }: { enabled: boolean }) {
   )
 }
 
-// ============ SCROLL-TO-TOP: MINIMAL HINT + CURTAIN WIPE ============
+// ============ SCROLL-TO-TOP: MINIMAL HINT + FADE ZOOM TRANSITION ============
 
 function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
   const [showConfirm, setShowConfirm] = useState(false)
@@ -632,20 +632,20 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
             atBottomRef.current = false
           }, 4000)
         } else {
-          // Second hit: trigger full curtain wipe + scroll to top
+          // Second hit: trigger fade zoom transition + scroll to top
           clearTimeout(dismissTimer.current)
           setShowConfirm(false)
           triggered.current = true
           setActive(true)
           onMorph('warp')
-          // Smooth scroll to top after curtain reaches center
-          setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 2200)
-          // Hide curtain after the 4-second overlay completes
+          // Smooth scroll to top at the peak of the zoom (when overlay is fully opaque)
+          setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 900)
+          // Hide overlay after the transition completes
           setTimeout(() => {
             setActive(false)
             triggered.current = false
             atBottomRef.current = false
-          }, 4000)
+          }, 2200)
         }
       }
 
@@ -679,79 +679,82 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
         )}
       </AnimatePresence>
 
-      {/* Full-screen gradient curtain wipe — second attempt */}
+      {/* Fade zoom transition — second attempt */}
       <AnimatePresence>
         {active && (
           <motion.div
-            className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
-            initial={{ opacity: 1 }}
+            className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, delay: 2.5 }}
+            transition={{ duration: 2.2, times: [0, 0.4, 0.6, 1], ease: [0.4, 0, 0.2, 1] }}
           >
-            {/* Liquid gradient curtain — wipes from bottom to top */}
+            {/* Dark blurred backdrop that fades in then out */}
             <motion.div
               className="absolute inset-0"
-              initial={{ y: '100%' }}
-              animate={{ y: '-100%' }}
-              transition={{ duration: 2, ease: [0.65, 0, 0.35, 1] }}
               style={{
-                background: 'linear-gradient(180deg, #0a0a0f 0%, #14b8a6 20%, #fbbf24 40%, #a855f7 60%, #f97316 80%, #0a0a0f 100%)',
+                background: 'radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.15), rgba(10, 10, 15, 0.96) 60%)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
               }}
-            >
-              {/* Liquid wave edge at top of curtain */}
-              <svg
-                className="absolute top-0 left-0 w-full"
-                style={{ transform: 'translateY(-99%)' }}
-                viewBox="0 0 1440 120"
-                preserveAspectRatio="none"
-              >
-                <motion.path
-                  d="M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z"
-                  fill="#0a0a0f"
-                  animate={{
-                    d: [
-                      'M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z',
-                      'M0,40 Q360,100 720,80 T1440,40 L1440,0 L0,0 Z',
-                      'M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z',
-                    ],
-                  }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              </svg>
+            />
 
-              {/* Center sparkle */}
+            {/* Center logo/initial that zooms in then fades */}
+            <motion.div
+              className="relative z-10 flex flex-col items-center gap-6"
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: [0.3, 1.1, 1, 0.8], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 2.2, times: [0, 0.4, 0.6, 1], ease: [0.4, 0, 0.2, 1] }}
+            >
+              {/* Glowing avatar ring */}
               <motion.div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: [0, 1.5, 1, 0], opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 2, ease: 'easeInOut' }}
+                className="relative w-24 h-24 rounded-full flex items-center justify-center"
+                style={{
+                  background: 'conic-gradient(from 0deg, #14b8a6, #fbbf24, #a855f7, #f97316, #14b8a6)',
+                  padding: 3,
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
               >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: 2, ease: 'linear' }}
-                  className="text-5xl"
-                >
-                  ✨
-                </motion.div>
+                <div className="w-full h-full rounded-full bg-[#0a0a0f] flex items-center justify-center">
+                  <motion.span
+                    className="text-4xl font-bold"
+                    style={{
+                      fontFamily: 'var(--font-playfair), Georgia, serif',
+                      background: 'linear-gradient(135deg, #14b8a6, #fbbf24, #a855f7)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >
+                    AV
+                  </motion.span>
+                </div>
               </motion.div>
 
-              {/* Loading dots */}
-              <motion.div
-                className="absolute left-1/2 top-[60%] -translate-x-1/2 flex gap-1.5"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 2, times: [0, 0.2, 0.8, 1] }}
-              >
+              {/* Subtle loading dots */}
+              <motion.div className="flex gap-1.5">
                 {[0, 1, 2].map((i) => (
                   <motion.span
                     key={i}
-                    className="w-2 h-2 rounded-full bg-white/80"
+                    className="w-1.5 h-1.5 rounded-full bg-white/70"
                     animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-                    transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                    transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
                   />
                 ))}
               </motion.div>
             </motion.div>
+
+            {/* Soft radial glow pulse */}
+            <motion.div
+              className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(20, 184, 166, 0.3), transparent 70%)',
+              }}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: [0.5, 1.5, 1.5, 0.5], opacity: [0, 0.6, 0.6, 0] }}
+              transition={{ duration: 2.2, times: [0, 0.4, 0.6, 1], ease: 'easeInOut' }}
+            />
           </motion.div>
         )}
       </AnimatePresence>
