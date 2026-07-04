@@ -13,7 +13,7 @@ import { Github, Mail, MapPin, Phone, ExternalLink, Download, Sparkles, Zap, Cod
 // ============ SOUND EFFECT SYSTEM ============
 
 function useSoundEffects() {
-  const [enabled, setEnabled] = useState(false) // Start muted — user must click to enable
+  const [enabled, setEnabled] = useState(true) // Default ON — sound enabled from the start
   const audioCtxRef = useRef<AudioContext | null>(null)
   const audioReadyRef = useRef(false)
 
@@ -156,6 +156,39 @@ function useSoundEffects() {
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [enabled, getCtx])
+
+  // ============ AUTO-UNLOCK AUDIO ON FIRST INTERACTION ============
+  // Browsers block audio until a user gesture. Since sound is ON by default,
+  // we listen for the first click/keydown/touch and resume the AudioContext.
+  // This makes sound "just work" as soon as the user interacts at all.
+  useEffect(() => {
+    if (!enabled) return
+
+    const unlock = () => {
+      try {
+        const ctx = getCtx()
+        if (ctx.state === 'suspended') ctx.resume()
+        // Play a subtle "welcome" tone so user knows sound is on
+        playPop()
+        // Start ambient music if not already playing
+        if (!musicNodesRef.current) startMusic()
+      } catch {}
+      // Remove listeners after first interaction
+      window.removeEventListener('click', unlock)
+      window.removeEventListener('keydown', unlock)
+      window.removeEventListener('touchstart', unlock)
+    }
+
+    window.addEventListener('click', unlock, { once: false })
+    window.addEventListener('keydown', unlock, { once: false })
+    window.addEventListener('touchstart', unlock, { once: false })
+
+    return () => {
+      window.removeEventListener('click', unlock)
+      window.removeEventListener('keydown', unlock)
+      window.removeEventListener('touchstart', unlock)
+    }
+  }, [enabled, getCtx, playPop, startMusic])
 
   useEffect(() => {
     if (enabled) startMusic()
@@ -1133,7 +1166,7 @@ export default function Home() {
                 }
               }}
               className="ml-2 p-2 rounded-lg border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-colors"
-              title={sound.enabled ? "Mute sounds" : "Enable sounds"}
+              title={sound.enabled ? "Sound is ON — click to mute" : "Sound is muted — click to enable"}
             >
               {sound.enabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </motion.button>
