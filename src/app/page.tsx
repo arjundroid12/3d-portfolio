@@ -1175,7 +1175,7 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
 // Section is pinned (sticky) while the 4 AI agent cards slide right→left.
 // Uses Framer Motion useScroll + useTransform for Lenis-compatible smooth motion.
 
-function AgentsShowcase({ sound }: { sound: any }) {
+function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: (inView: boolean) => void }) {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [trackWidth, setTrackWidth] = useState(0)
@@ -1215,6 +1215,12 @@ function AgentsShowcase({ sound }: { sound: any }) {
 
   // Progress bar width (0% → 100%)
   const progressWidth = useTransform(smoothProgress, [0, 1], ['0%', '100%'])
+
+  // Theme shift — when this section is in view, notify parent to switch to red/black theme
+  const agentsInView = useInView(sectionRef, { margin: '-20% 0px -20% 0px' })
+  useEffect(() => {
+    onThemeChange?.(agentsInView)
+  }, [agentsInView, onThemeChange])
 
   // Gradient backgrounds for each agent (matches their original gradients)
   const agentGradients: Record<string, string> = {
@@ -1381,9 +1387,15 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
   const [entered, setEntered] = useState(false)
+  const [redTheme, setRedTheme] = useState(false)
   const sound = useSoundEffects()
   const heroRef = useRef<HTMLElement>(null)
   const heroInView = useInView(heroRef, { once: true })
+
+  // Stable callback for AgentsShowcase to notify theme changes
+  const handleThemeChange = useCallback((inView: boolean) => {
+    setRedTheme(inView)
+  }, [])
 
   const handleProjectClick = useCallback((project: typeof PROJECTS[0]) => {
     sound.playModalOpen()
@@ -1449,6 +1461,34 @@ export default function Home() {
           ],
         }}
         transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+      />
+
+      {/* ============ RED/BLACK THEME OVERLAY (agents section) ============ */}
+      {/* Fades in a deep crimson + pure black background when the agents
+          section is in view, fades out when scrolled past. Sits above the
+          normal aurora but below content/cards. */}
+      <motion.div
+        className="fixed inset-0 z-[1] pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: redTheme ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+        style={{
+          background: `
+            radial-gradient(ellipse at 30% 20%, rgba(139, 0, 0, 0.55), transparent 55%),
+            radial-gradient(ellipse at 70% 80%, rgba(220, 20, 60, 0.40), transparent 60%),
+            linear-gradient(180deg, #0a0203 0%, #1a0507 50%, #0a0203 100%)
+          `,
+        }}
+      />
+      {/* Subtle red vignette + starry texture for the red theme */}
+      <motion.div
+        className="fixed inset-0 z-[1] pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: redTheme ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%)',
+        }}
       />
 
       {/* ============ 3D BACKGROUND CANVAS ============ */}
@@ -1695,7 +1735,7 @@ export default function Home() {
       </motion.section>
 
       {/* ============ AI AGENTS SECTION — HORIZONTAL PINNED SCROLL ============ */}
-      <AgentsShowcase sound={sound} />
+      <AgentsShowcase sound={sound} onThemeChange={handleThemeChange} />
 
       {/* ============ PROJECTS SECTION ============ */}
       <section id="projects" className="relative z-10 py-24 px-6">
