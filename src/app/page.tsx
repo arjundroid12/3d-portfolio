@@ -605,11 +605,11 @@ function FunPopups({ enabled }: { enabled: boolean }) {
   )
 }
 
-// ============ SCROLL-TO-TOP: MINIMAL HINT + FADE ZOOM TRANSITION ============
+// ============ SCROLL-TO-TOP: CLEAN LIQUID GLASS POPUP ============
 
 function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
   const [showConfirm, setShowConfirm] = useState(false)
-  const [active, setActive] = useState(false)
+  const [scrolling, setScrolling] = useState(false)
   const lastScrollY = useRef(0)
   const triggered = useRef(false)
   const dismissTimer = useRef<any>(null)
@@ -635,20 +635,20 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
             atBottomRef.current = false
           }, 4000)
         } else {
-          // Second hit: trigger fade zoom transition + scroll to top
+          // Second hit: clean liquid glass popup + smooth scroll to top
           clearTimeout(dismissTimer.current)
           setShowConfirm(false)
           triggered.current = true
-          setActive(true)
+          setScrolling(true)
           onMorph('warp')
-          // Smooth scroll to top at the peak of the zoom (when overlay is fully opaque)
-          setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 900)
-          // Hide overlay after the transition completes
+          // Smooth scroll to top immediately (works with Lenis)
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          // Hide the popup after scroll completes
           setTimeout(() => {
-            setActive(false)
+            setScrolling(false)
             triggered.current = false
             atBottomRef.current = false
-          }, 2200)
+          }, 1800)
         }
       }
 
@@ -682,82 +682,26 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
         )}
       </AnimatePresence>
 
-      {/* Fade zoom transition — second attempt */}
+      {/* Clean liquid glass popup — second attempt (no full-screen overlay) */}
       <AnimatePresence>
-        {active && (
+        {scrolling && (
           <motion.div
-            className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 1, 0] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2.2, times: [0, 0.4, 0.6, 1], ease: [0.4, 0, 0.2, 1] }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-3.5 liquid-glass rounded-full shadow-2xl pointer-events-none flex items-center gap-2.5"
           >
-            {/* Dark blurred backdrop that fades in then out */}
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                background: 'radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.15), rgba(10, 10, 15, 0.96) 60%)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-              }}
-            />
-
-            {/* Center logo/initial that zooms in then fades */}
-            <motion.div
-              className="relative z-10 flex flex-col items-center gap-6"
-              initial={{ scale: 0.3, opacity: 0 }}
-              animate={{ scale: [0.3, 1.1, 1, 0.8], opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 2.2, times: [0, 0.4, 0.6, 1], ease: [0.4, 0, 0.2, 1] }}
+            <motion.span
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-sm text-white/90"
             >
-              {/* Glowing avatar ring */}
-              <motion.div
-                className="relative w-24 h-24 rounded-full flex items-center justify-center"
-                style={{
-                  background: 'conic-gradient(from 0deg, #14b8a6, #fbbf24, #a855f7, #f97316, #14b8a6)',
-                  padding: 3,
-                }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              >
-                <div className="w-full h-full rounded-full bg-[#0a0a0f] flex items-center justify-center">
-                  <motion.span
-                    className="text-4xl font-bold"
-                    style={{
-                      fontFamily: 'var(--font-playfair), Georgia, serif',
-                      background: 'linear-gradient(135deg, #14b8a6, #fbbf24, #a855f7)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}
-                  >
-                    AV
-                  </motion.span>
-                </div>
-              </motion.div>
-
-              {/* Subtle loading dots */}
-              <motion.div className="flex gap-1.5">
-                {[0, 1, 2].map((i) => (
-                  <motion.span
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-white/70"
-                    animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-                    transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
-                  />
-                ))}
-              </motion.div>
-            </motion.div>
-
-            {/* Soft radial glow pulse */}
-            <motion.div
-              className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle, rgba(20, 184, 166, 0.3), transparent 70%)',
-              }}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: [0.5, 1.5, 1.5, 0.5], opacity: [0, 0.6, 0.6, 0] }}
-              transition={{ duration: 2.2, times: [0, 0.4, 0.6, 1], ease: 'easeInOut' }}
-            />
+              ↑
+            </motion.span>
+            <p className="text-white/90 text-xs font-medium tracking-wide">
+              Returning to top…
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
