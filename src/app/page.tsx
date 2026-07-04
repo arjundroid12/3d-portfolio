@@ -641,8 +641,13 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
           triggered.current = true
           setScrolling(true)
           onMorph('warp')
-          // Smooth scroll to top immediately (works with Lenis)
-          window.scrollTo({ top: 0, behavior: 'smooth' })
+          // Smooth scroll to top via Lenis (if available) for buttery scroll
+          const lenis = (window as any).__lenis
+          if (lenis) {
+            lenis.scrollTo(0, { duration: 2.2, easing: (t: number) => 1 - Math.pow(1 - t, 4) })
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }
           // Hide the popup after scroll completes
           setTimeout(() => {
             setScrolling(false)
@@ -974,24 +979,35 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
     // Skip on mobile / touch devices (native momentum scroll is better there)
     if (window.matchMedia('(hover: none)').matches) return
 
+    // Premium cubic-bezier easing — matches Framer Motion's [0.22, 1, 0.36, 1]
+    // This is the "premium ease-out" curve used by iOS and high-end apps.
+    const premiumEasing = (t: number) => {
+      // Cubic-bezier approximation of [0.22, 1, 0.36, 1]
+      return 1 - Math.pow(1 - t, 4) // ease-out-quart — even smoother than expo
+    }
+
     const lenis = new Lenis({
-      duration: 1.6,              // slower = smoother, more cinematic (was 1.15)
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // expo-out
+      duration: 1.4,              // balanced: smooth but responsive
+      easing: premiumEasing,      // ease-out-quart for premium deceleration
       smoothWheel: true,
-      wheelMultiplier: 0.8,       // slower wheel scroll (was 1) — more deliberate
-      touchMultiplier: 1.2,
+      wheelMultiplier: 0.9,       // natural wheel speed
+      touchMultiplier: 1.5,       // responsive touch
       infinite: false,
-      // Use requestAnimationFrame throttle for ultra-smooth 60fps
       syncTouch: false,
+      // lerp: 0.08,               // alternative to duration — uncomment for lerp mode
+      gestureOrientation: 'vertical',
+      orientation: 'vertical',
+      // Prevent jank on rapid scroll
+      autoResize: true,
     })
 
-    // Drive Lenis with requestAnimationFrame — use a single rAF loop
-    // and cap delta to prevent jank after tab switch
+    // Drive Lenis with requestAnimationFrame — single rAF loop
+    // Cap delta to prevent jank after tab switch (when rAF pauses)
     let rafId: number
     let lastTime = 0
     const raf = (time: number) => {
-      // Cap delta to 100ms to prevent huge jumps after tab switch
-      if (lastTime && time - lastTime > 100) {
+      // Cap delta to 32ms (~2 frames) to prevent huge jumps after tab switch
+      if (lastTime && time - lastTime > 32) {
         lastTime = time - 16
       }
       lenis.raf(time)
@@ -1000,13 +1016,33 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
     }
     rafId = requestAnimationFrame(raf)
 
-    // Expose lenis globally so Framer Motion's useScroll stays in sync
-    // (Lenis updates native scrollTop, which Framer Motion listens to)
+    // Smooth anchor link navigation — when clicking nav links (#agents, #projects, etc.)
+    // Lenis intercepts and smoothly scrolls instead of the default jump
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const anchor = target.closest('a[href^="#"]') as HTMLAnchorElement | null
+      if (!anchor) return
+      const href = anchor.getAttribute('href')
+      if (!href || href === '#') return
+      const el = document.querySelector(href)
+      if (el) {
+        e.preventDefault()
+        lenis.scrollTo(el as HTMLElement, {
+          offset: -80, // account for fixed nav height
+          duration: 1.8, // slow, premium scroll-to-section
+          easing: premiumEasing,
+        })
+      }
+    }
+    document.addEventListener('click', handleAnchorClick)
+
+    // Expose lenis globally for programmatic scrolling + Framer Motion sync
     ;(window as any).__lenis = lenis
 
     // Cleanup
     return () => {
       cancelAnimationFrame(rafId)
+      document.removeEventListener('click', handleAnchorClick)
       lenis.destroy()
     }
   }, [])
