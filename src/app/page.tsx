@@ -1054,6 +1054,95 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+// ============ MINIMAL SPLASH SCREEN ============
+// White background, purple "ARJUN" wordmark, click to enter.
+
+function SplashScreen({ onEnter }: { onEnter: () => void }) {
+  const [leaving, setLeaving] = useState(false)
+
+  const handleClick = () => {
+    if (leaving) return
+    setLeaving(true)
+    // Wait for exit animation, then notify parent
+    setTimeout(onEnter, 900)
+  }
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[500] flex items-center justify-center cursor-pointer"
+      onClick={handleClick}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: leaving ? 0 : 1 }}
+      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+      style={{ background: '#ffffff' }}
+    >
+      {/* Subtle radial glow behind the name */}
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(138, 43, 226, 0.08), transparent 70%)',
+        }}
+        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      {/* The wordmark */}
+      <motion.div
+        className="relative flex items-start"
+        initial={{ opacity: 0, y: 30, letterSpacing: '0.5em' }}
+        animate={{
+          opacity: leaving ? 0 : 1,
+          y: leaving ? -20 : 0,
+          letterSpacing: leaving ? '0.2em' : '0.05em',
+        }}
+        transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}
+      >
+        <motion.h1
+          className="font-bold select-none"
+          style={{
+            fontFamily: 'var(--font-playfair), Georgia, serif',
+            color: '#8A2BE2',
+            fontSize: 'clamp(56px, 12vw, 160px)',
+            lineHeight: 1,
+            letterSpacing: '0.05em',
+          }}
+        >
+          ARJUN
+        </motion.h1>
+        {/* Registered-style superscript */}
+        <motion.span
+          className="text-sm font-medium mt-3 ml-1"
+          style={{
+            color: '#8A2BE2',
+            opacity: 0.6,
+            fontFamily: 'var(--font-inter), sans-serif',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: leaving ? 0 : 0.6 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+        >
+          ®
+        </motion.span>
+      </motion.div>
+
+      {/* "Click to enter" hint at bottom */}
+      <motion.div
+        className="absolute bottom-12 left-1/2 -translate-x-1/2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: leaving ? 0 : [0, 0.5, 0] }}
+        transition={{ delay: 1, duration: 2.5, repeat: Infinity }}
+      >
+        <span
+          className="text-xs uppercase tracking-[0.4em] font-medium"
+          style={{ color: '#8A2BE2', fontFamily: 'var(--font-inter), sans-serif' }}
+        >
+          Click to enter
+        </span>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 // ============ MAIN PAGE ============
 
 export default function Home() {
@@ -1065,6 +1154,7 @@ export default function Home() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [mounted, setMounted] = useState(false)
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
+  const [entered, setEntered] = useState(false)
   const sound = useSoundEffects()
   const heroRef = useRef<HTMLElement>(null)
   const heroInView = useInView(heroRef, { once: true })
@@ -1091,11 +1181,28 @@ export default function Home() {
     return () => window.removeEventListener('mousemove', handleMouse)
   }, [])
 
+  // Lock body scroll while splash screen is showing
+  useEffect(() => {
+    if (!entered) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [entered])
+
   const filteredProjects = activeFilter === 'All' ? PROJECTS : PROJECTS.filter(p => p.category === activeFilter)
 
   return (
     <SmoothScroll>
     <div className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
+      {/* ============ SPLASH SCREEN (white + purple, click to enter) ============ */}
+      <AnimatePresence>
+        {!entered && (
+          <SplashScreen onEnter={() => { setEntered(true); sound.playPop() }} />
+        )}
+      </AnimatePresence>
+
       {/* ============ FUN POPUPS ============ */}
       <FunPopups enabled={sound.enabled} />
 
