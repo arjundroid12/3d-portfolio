@@ -175,7 +175,9 @@ canvas {
 }
 
 /* Reduce paint on scroll — contain layout/paint to viewport */
-section, header, footer, main {
+/* NOTE: Do NOT add 'contain' to section — it breaks position:sticky
+   which the horizontal pinned agents section relies on. */
+header, footer, main {
   contain: layout style;
 }
 

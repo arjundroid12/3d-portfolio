@@ -1172,38 +1172,49 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
 
 // ============ HORIZONTAL PINNED AGENTS SHOWCASE ============
 // Vertical scroll → horizontal card movement (Lenis-style).
-// Section is pinned while the 4 AI agent cards slide from right to left.
+// Section is pinned (sticky) while the 4 AI agent cards slide right→left.
+// Uses Framer Motion useScroll + useTransform for Lenis-compatible smooth motion.
 
 function AgentsShowcase({ sound }: { sound: any }) {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
-  const [progress, setProgress] = useState(0)
+  const [trackWidth, setTrackWidth] = useState(0)
 
+  // Measure the track width after mount + on resize
   useEffect(() => {
-    const section = sectionRef.current
-    const track = trackRef.current
-    if (!section || !track) return
-
-    const handleScroll = () => {
-      const rect = section.getBoundingClientRect()
-      const windowHeight = window.innerHeight
-      const sectionHeight = section.offsetHeight
-      const scrollable = sectionHeight - windowHeight
-      const scrolled = Math.max(0, Math.min(scrollable, -rect.top))
-      const p = scrollable > 0 ? scrolled / scrollable : 0
-      setProgress(p)
-
-      const trackWidth = track.scrollWidth - window.innerWidth
-      if (trackWidth > 0) {
-        const x = -p * trackWidth
-        track.style.transform = `translate3d(${x}px, 0, 0)`
+    const measure = () => {
+      if (trackRef.current) {
+        setTrackWidth(trackRef.current.scrollWidth - window.innerWidth)
       }
     }
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    measure()
+    window.addEventListener('resize', measure)
+    // Re-measure after a tick (fonts/layout may shift)
+    const t = setTimeout(measure, 500)
+    return () => { window.removeEventListener('resize', measure); clearTimeout(t) }
   }, [])
+
+  // Framer Motion scroll tracking — target the section, map start→end to 0→1
+  // offset: ["start start", "end end"] means progress goes 0 when the section's
+  // top hits the viewport top, and 1 when the section's bottom hits viewport bottom.
+  // This is exactly the pinned-scroll range.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  })
+
+  // Spring-smooth the progress for extra butter (works with Lenis)
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 80,
+    damping: 20,
+    restDelta: 0.001,
+  })
+
+  // Map progress (0→1) to horizontal translate (0 → -trackWidth)
+  const x = useTransform(smoothProgress, [0, 1], [0, -trackWidth])
+
+  // Progress bar width (0% → 100%)
+  const progressWidth = useTransform(smoothProgress, [0, 1], ['0%', '100%'])
 
   // Gradient backgrounds for each agent (matches their original gradients)
   const agentGradients: Record<string, string> = {
@@ -1225,7 +1236,7 @@ function AgentsShowcase({ sound }: { sound: any }) {
       ref={sectionRef}
       id="agents"
       className="relative z-10"
-      style={{ height: `${AI_AGENTS.length * 90}vh` }}
+      style={{ height: `${AI_AGENTS.length * 100}vh` }}
     >
       {/* Sticky container — pinned while track scrolls horizontally */}
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
@@ -1252,11 +1263,11 @@ function AgentsShowcase({ sound }: { sound: any }) {
           <p className="text-white/40 text-sm">Scroll to explore →</p>
         </motion.div>
 
-        {/* Horizontal track of agent cards */}
-        <div
+        {/* Horizontal track — driven by Framer Motion useTransform */}
+        <motion.div
           ref={trackRef}
+          style={{ x, width: 'max-content' }}
           className="flex gap-6 px-6 will-change-transform"
-          style={{ width: 'max-content' }}
         >
           {AI_AGENTS.map((agent, i) => (
             <div
@@ -1284,13 +1295,12 @@ function AgentsShowcase({ sound }: { sound: any }) {
                 </span>
               </div>
 
-              {/* Icon */}
+              {/* Icon + content */}
               <div className="relative z-10">
                 <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center mb-6">
                   <agent.icon className="w-8 h-8 text-white" />
                 </div>
 
-                {/* Title */}
                 <h3
                   className="text-white text-3xl md:text-4xl font-bold mb-3"
                   style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
@@ -1298,15 +1308,12 @@ function AgentsShowcase({ sound }: { sound: any }) {
                   {agent.name}
                 </h3>
 
-                {/* Tagline */}
                 <p className="text-white/80 text-sm mb-4 italic">{agent.tagline}</p>
 
-                {/* Description */}
                 <p className="text-white/70 text-sm leading-relaxed mb-6 max-w-md">
                   {agent.description}
                 </p>
 
-                {/* Tech tags */}
                 <div className="flex flex-wrap gap-2 mb-6">
                   {agent.tech.map((t: string) => (
                     <span
@@ -1318,7 +1325,6 @@ function AgentsShowcase({ sound }: { sound: any }) {
                   ))}
                 </div>
 
-                {/* Links */}
                 <div className="flex gap-3">
                   {agent.demo && agent.demo !== '#' && (
                     <a
@@ -1344,17 +1350,19 @@ function AgentsShowcase({ sound }: { sound: any }) {
               </div>
             </div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Progress bar */}
+        {/* Progress bar — driven by Framer Motion */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-64 h-1 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full transition-none"
-            style={{
-              width: `${progress * 100}%`,
-              background: 'linear-gradient(90deg, #8A2BE2, #14b8a6, #fbbf24)',
-            }}
-          />
+          <motion.div
+            style={{ width: progressWidth }}
+            className="h-full rounded-full"
+          >
+            <div
+              className="w-full h-full"
+              style={{ background: 'linear-gradient(90deg, #8A2BE2, #14b8a6, #fbbf24)' }}
+            />
+          </motion.div>
         </div>
       </div>
     </section>
