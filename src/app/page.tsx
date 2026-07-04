@@ -602,11 +602,11 @@ function FunPopups({ enabled }: { enabled: boolean }) {
   )
 }
 
-// ============ MINIMAL SCROLL-TO-TOP POPUP ============
+// ============ SCROLL-TO-TOP: MINIMAL HINT + CURTAIN WIPE ============
 
 function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
   const [showConfirm, setShowConfirm] = useState(false)
-  const [scrolling, setScrolling] = useState(false)
+  const [active, setActive] = useState(false)
   const lastScrollY = useRef(0)
   const triggered = useRef(false)
   const dismissTimer = useRef<any>(null)
@@ -623,7 +623,7 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
 
       if (atBottom && scrollingDown && !triggered.current) {
         if (!atBottomRef.current) {
-          // First hit at bottom: show minimal "scroll once more" popup
+          // First hit at bottom: show minimal "scroll once more" pill
           atBottomRef.current = true
           setShowConfirm(true)
           onMorph('confirm')
@@ -632,20 +632,20 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
             atBottomRef.current = false
           }, 4000)
         } else {
-          // Second hit: minimal scroll-to-top with small popup
+          // Second hit: trigger full curtain wipe + scroll to top
           clearTimeout(dismissTimer.current)
           setShowConfirm(false)
           triggered.current = true
-          setScrolling(true)
+          setActive(true)
           onMorph('warp')
-          // Smooth scroll to top (works with or without Lenis)
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-          // Hide the "scrolling to top" popup after scroll completes
+          // Smooth scroll to top after curtain reaches center
+          setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 2200)
+          // Hide curtain after the 4-second overlay completes
           setTimeout(() => {
-            setScrolling(false)
+            setActive(false)
             triggered.current = false
             atBottomRef.current = false
-          }, 1500)
+          }, 4000)
         }
       }
 
@@ -662,7 +662,7 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
 
   return (
     <>
-      {/* Minimal "scroll once more" hint */}
+      {/* Minimal "scroll once more" hint — first attempt */}
       <AnimatePresence>
         {showConfirm && (
           <motion.div
@@ -679,26 +679,79 @@ function MorphTransition({ onMorph }: { onMorph: (type: string) => void }) {
         )}
       </AnimatePresence>
 
-      {/* Minimal "scrolling to top" popup */}
+      {/* Full-screen gradient curtain wipe — second attempt */}
       <AnimatePresence>
-        {scrolling && (
+        {active && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-5 py-3 liquid-glass rounded-full shadow-2xl pointer-events-none flex items-center gap-2.5"
+            className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, delay: 2.5 }}
           >
-            <motion.span
-              animate={{ y: [0, -3, 0] }}
-              transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-sm"
+            {/* Liquid gradient curtain — wipes from bottom to top */}
+            <motion.div
+              className="absolute inset-0"
+              initial={{ y: '100%' }}
+              animate={{ y: '-100%' }}
+              transition={{ duration: 2, ease: [0.65, 0, 0.35, 1] }}
+              style={{
+                background: 'linear-gradient(180deg, #0a0a0f 0%, #14b8a6 20%, #fbbf24 40%, #a855f7 60%, #f97316 80%, #0a0a0f 100%)',
+              }}
             >
-              ↑
-            </motion.span>
-            <p className="text-white/90 text-xs font-medium tracking-wide">
-              Scrolling to top…
-            </p>
+              {/* Liquid wave edge at top of curtain */}
+              <svg
+                className="absolute top-0 left-0 w-full"
+                style={{ transform: 'translateY(-99%)' }}
+                viewBox="0 0 1440 120"
+                preserveAspectRatio="none"
+              >
+                <motion.path
+                  d="M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z"
+                  fill="#0a0a0f"
+                  animate={{
+                    d: [
+                      'M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z',
+                      'M0,40 Q360,100 720,80 T1440,40 L1440,0 L0,0 Z',
+                      'M0,60 Q360,120 720,60 T1440,60 L1440,0 L0,0 Z',
+                    ],
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              </svg>
+
+              {/* Center sparkle */}
+              <motion.div
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [0, 1.5, 1, 0], opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 2, ease: 'easeInOut' }}
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: 2, ease: 'linear' }}
+                  className="text-5xl"
+                >
+                  ✨
+                </motion.div>
+              </motion.div>
+
+              {/* Loading dots */}
+              <motion.div
+                className="absolute left-1/2 top-[60%] -translate-x-1/2 flex gap-1.5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 2, times: [0, 0.2, 0.8, 1] }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-white/80"
+                    animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+                    transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                  />
+                ))}
+              </motion.div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
