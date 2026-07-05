@@ -1626,13 +1626,13 @@ function ProjectsTransition() {
   })
 
   // Phase 1: "Liked my agents?" — starts CENTER, moves to upper-LEFT as you scroll
-  // Movement is tied to scroll pace — text reaches corner when you've scrolled through
-  const likedLeft = useTransform(smoothProgress, [0, 0.20], ['50%', '5%'])
-  const likedTop = useTransform(smoothProgress, [0, 0.20], ['50%', '18%'])
-  const likedX = useTransform(smoothProgress, [0, 0.20], ['-50%', '0%'])
-  const likedY = useTransform(smoothProgress, [0, 0.20], ['-50%', '0%'])
-  const likedScale = useTransform(smoothProgress, [0, 0.20], [1, 1.3])
-  const likedOpacity = useTransform(smoothProgress, [0, 0.03, 0.25, 0.35], [0, 1, 1, 0])
+  // Movement starts EARLY — text begins dragging immediately on scroll
+  const likedLeft = useTransform(smoothProgress, [-0.05, 0.15], ['50%', '5%'])
+  const likedTop = useTransform(smoothProgress, [-0.05, 0.15], ['50%', '18%'])
+  const likedX = useTransform(smoothProgress, [-0.05, 0.15], ['-50%', '0%'])
+  const likedY = useTransform(smoothProgress, [-0.05, 0.15], ['-50%', '0%'])
+  const likedScale = useTransform(smoothProgress, [-0.05, 0.15], [1, 1.3])
+  const likedOpacity = useTransform(smoothProgress, [-0.05, 0.0, 0.20, 0.30], [0, 1, 1, 0])
 
   // Phase 2: "Here's more" — fades in at bottom-RIGHT corner, stays visible
   // Fades in at 0.20, stays until 0.65, then fades out
