@@ -1840,10 +1840,10 @@ export default function Home() {
         style={{
           position: 'fixed',
           top: '26px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 'calc(100% - 44px)',
+          left: '22px',
+          right: '22px',
           maxWidth: '1140px',
+          margin: '0 auto',
           zIndex: 50,
         }}
       >
