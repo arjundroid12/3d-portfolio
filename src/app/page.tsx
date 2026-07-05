@@ -2272,33 +2272,30 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   const wheelRef = useRef<HTMLDivElement>(null)
   const rotation = useMotionValue(0)
   const smoothRotation = useSpring(rotation, { stiffness: 120, damping: 20 })
-  const isHovering = useRef(false)
   const [progress, setProgress] = useState(0)
 
   const radius = 360
   const cardAngle = 360 / projects.length
 
-  // Native wheel listener on WINDOW — only intercepts when hovering wheel
-  // Must be on window (not the div) because wheel events bubble up to
-  // document before reaching the element listener in some browsers.
+  // Wheel listener on the wheel container element ONLY
+  // When mouse is over the wheel: preventDefault stops page scroll,
+  // deltaY spins the wheel.
+  // When mouse is NOT over the wheel: this listener doesn't fire,
+  // so page scrolls normally.
   useEffect(() => {
+    const el = wheelRef.current
+    if (!el) return
+
     const handleWheel = (e: WheelEvent) => {
-      if (!isHovering.current) return
-      // Only prevent default if the event target is inside the wheel
-      const el = wheelRef.current
-      if (!el) return
-      const target = e.target as Node
-      if (el.contains(target) || el === target) {
-        e.preventDefault()
-        e.stopPropagation()
-        // Accumulate scroll delta into rotation
-        rotation.set(rotation.get() + e.deltaY * 0.25)
-      }
+      // Always prevent default when scrolling over the wheel
+      e.preventDefault()
+      e.stopPropagation()
+      // Spin the wheel
+      rotation.set(rotation.get() + e.deltaY * 0.25)
     }
 
-    // Use capture phase to intercept before any other handlers
-    window.addEventListener('wheel', handleWheel, { passive: false, capture: true })
-    return () => window.removeEventListener('wheel', handleWheel, { capture: true } as any)
+    el.addEventListener('wheel', handleWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleWheel)
   }, [rotation])
 
   // Track progress (which card is at top)
@@ -2314,8 +2311,6 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   return (
     <div
       ref={wheelRef}
-      onMouseEnter={() => { isHovering.current = true }}
-      onMouseLeave={() => { isHovering.current = false }}
       style={{
         position: 'relative',
         width: '100%',
