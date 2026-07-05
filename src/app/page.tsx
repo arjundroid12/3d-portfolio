@@ -1715,13 +1715,35 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
   const [entered, setEntered] = useState(false)
   const [redTheme, setRedTheme] = useState(false)
+  const redThemeRef = useRef<HTMLElement>(null)
   const sound = useSoundEffects()
   const heroRef = useRef<HTMLElement>(null)
   const heroInView = useInView(heroRef, { once: true })
 
-  // Stable callback for AgentsShowcase to notify theme changes
+  // Track scroll progress through the agents section for smooth red theme fade
+  // The red overlay opacity is driven by scroll position, not a boolean toggle
+  const { scrollYProgress: agentsScrollProgress } = useScroll({
+    target: redThemeRef,
+    offset: ['start end', 'end start'],
+  })
+  // Red overlay: fully visible when agents section is in middle of viewport,
+  // fades out GRADUALLY as you scroll past it (no hard line)
+  const redOverlayOpacity = useTransform(
+    agentsScrollProgress,
+    [0, 0.15, 0.5, 0.85, 1],
+    [0, 1, 1, 0.3, 0]
+  )
+
+  // Keep the boolean for other logic
+  useEffect(() => {
+    return agentsScrollProgress.on('change', (v) => {
+      setRedTheme(v > 0.1 && v < 0.9)
+    })
+  }, [agentsScrollProgress])
+
+  // Stable callback for AgentsShowcase (kept for compatibility)
   const handleThemeChange = useCallback((inView: boolean) => {
-    setRedTheme(inView)
+    // No longer used for red overlay — scroll-driven opacity handles it
   }, [])
 
   const handleProjectClick = useCallback((project: typeof PROJECTS[0]) => {
@@ -1793,10 +1815,8 @@ export default function Home() {
           to avoid a hard line between agents and transition sections. */}
       <motion.div
         className="fixed inset-0 z-[1] pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: redTheme ? 1 : 0 }}
-        transition={{ duration: 2.5, ease: [0.4, 0, 0.2, 1] }}
         style={{
+          opacity: redOverlayOpacity,
           background: `
             radial-gradient(ellipse at 30% 20%, rgba(139, 0, 0, 0.55), transparent 55%),
             radial-gradient(ellipse at 70% 80%, rgba(220, 20, 60, 0.40), transparent 60%),
@@ -1807,10 +1827,8 @@ export default function Home() {
       {/* Subtle red vignette for the red theme */}
       <motion.div
         className="fixed inset-0 z-[1] pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: redTheme ? 1 : 0 }}
-        transition={{ duration: 2.5, ease: [0.4, 0, 0.2, 1] }}
         style={{
+          opacity: redOverlayOpacity,
           background: 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%)',
         }}
       />
@@ -2014,7 +2032,10 @@ export default function Home() {
       </motion.section>
 
       {/* ============ AI AGENTS SECTION — HORIZONTAL PINNED SCROLL ============ */}
-      <AgentsShowcase sound={sound} onThemeChange={handleThemeChange} />
+      {/* Wrapper with ref for scroll-driven red theme fade */}
+      <div ref={redThemeRef}>
+        <AgentsShowcase sound={sound} onThemeChange={handleThemeChange} />
+      </div>
 
       {/* ============ TRANSITION: ZOOM INTO "PROJECTS" + THEME CHANGE ============ */}
       <ProjectsTransition />
