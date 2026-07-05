@@ -583,56 +583,58 @@ function FunPopups({ enabled }: { enabled: boolean }) {
         {popups.map((popup) => (
           <motion.div
             key={popup.id}
-            initial={{ opacity: 0, x: 50, scale: 0.8 }}
+            initial={{ opacity: 0, x: 30, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 50, scale: 0.8 }}
+            exit={{ opacity: 0, x: 30, scale: 0.8 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             style={{
               position: 'fixed',
-              bottom: '180px',
-              right: '140px',
-              maxWidth: '240px',
+              bottom: '150px',
+              right: '15px',
+              maxWidth: '220px',
             }}
           >
-            {/* Speech bubble — game-style with tail pointing to character */}
+            {/* Pixel-art RPG speech bubble — matches Goddess character style */}
             <div style={{
               position: 'relative',
-              background: 'rgba(245, 245, 245, 0.95)',
-              border: '2px solid #333',
-              borderRadius: '8px',
-              padding: '10px 14px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+              background: '#1a1a2e',
+              border: '3px solid #b9a3ff',
+              borderRadius: '0px',
+              padding: '10px 12px',
+              boxShadow: '0 0 0 1px #0a0a0f, 0 4px 12px rgba(138, 43, 226, 0.3)',
+              imageRendering: 'pixelated',
             }}>
               <p style={{
                 margin: 0,
-                fontSize: '12px',
-                fontFamily: 'var(--font-inter), sans-serif',
-                color: '#222',
-                lineHeight: 1.4,
-                fontWeight: 500,
+                fontSize: '14px',
+                fontFamily: 'var(--font-vt323), "VT323", "JetBrains Mono", monospace',
+                color: '#e0d4ff',
+                lineHeight: 1.3,
+                fontWeight: 400,
+                letterSpacing: '0.5px',
               }}>
                 {popup.text}
               </p>
-              {/* Tail pointing to character (bottom-right) */}
+              {/* Pixel-style tail pointing down to character */}
               <div style={{
                 position: 'absolute',
-                bottom: '-10px',
-                right: '20px',
-                width: '0',
-                height: '0',
-                borderLeft: '8px solid transparent',
-                borderRight: '8px solid transparent',
-                borderTop: '10px solid #333',
-              }} />
-              <div style={{
-                position: 'absolute',
-                bottom: '-7px',
-                right: '22px',
+                bottom: '-9px',
+                right: '15px',
                 width: '0',
                 height: '0',
                 borderLeft: '6px solid transparent',
                 borderRight: '6px solid transparent',
-                borderTop: '8px solid rgba(245, 245, 245, 0.95)',
+                borderTop: '9px solid #b9a3ff',
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '-5px',
+                right: '17px',
+                width: '0',
+                height: '0',
+                borderLeft: '4px solid transparent',
+                borderRight: '4px solid transparent',
+                borderTop: '6px solid #1a1a2e',
               }} />
             </div>
           </motion.div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, JetBrains_Mono, Anton, Bebas_Neue } from "next/font/google";
+import { Playfair_Display, Inter, JetBrains_Mono, Anton, Bebas_Neue, VT323 } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -38,6 +38,14 @@ const bebasNeue = Bebas_Neue({
   weight: ["400"],
 });
 
+// VT323 — pixel/retro font for speech bubbles (matches Goddess pixel art)
+const vt323 = VT323({
+  variable: "--font-vt323",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400"],
+});
+
 export const metadata: Metadata = {
   title: "Arjun Vashishtha — Full-Stack Developer & AI Builder",
   description: "Portfolio of Arjun Vashishtha — 4th-year B.Tech CSE student at VIT Bhopal. Building autonomous AI agents, full-stack apps, and data-driven solutions.",
@@ -58,7 +66,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${playfair.variable} ${inter.variable} ${jetbrainsMono.variable} ${anton.variable} ${bebasNeue.variable} antialiased bg-background text-foreground`}
+        className={`${playfair.variable} ${inter.variable} ${jetbrainsMono.variable} ${anton.variable} ${bebasNeue.variable} ${vt323.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />
