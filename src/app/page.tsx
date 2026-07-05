@@ -1789,12 +1789,13 @@ export default function Home() {
 
       {/* ============ RED/BLACK THEME OVERLAY (agents section) ============ */}
       {/* Fades in a deep crimson + pure black background when the agents
-          section is in view, fades out when scrolled past. */}
+          section is in view, fades out VERY slowly when scrolled past
+          to avoid a hard line between agents and transition sections. */}
       <motion.div
         className="fixed inset-0 z-[1] pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: redTheme ? 1 : 0 }}
-        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 2.5, ease: [0.4, 0, 0.2, 1] }}
         style={{
           background: `
             radial-gradient(ellipse at 30% 20%, rgba(139, 0, 0, 0.55), transparent 55%),
@@ -1808,7 +1809,7 @@ export default function Home() {
         className="fixed inset-0 z-[1] pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: redTheme ? 1 : 0 }}
-        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 2.5, ease: [0.4, 0, 0.2, 1] }}
         style={{
           background: 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%)',
         }}
