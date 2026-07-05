@@ -83,17 +83,18 @@ function useSoundEffects() {
     } catch {}
   }, [enabled, getCtx])
 
-  // Real WAV sound effects (from user's SweetSounds SFX pack)
+  // Real WAV sound effects (from user's SweetSounds SFX pack — 32 sounds)
   const playHover = useCallback(() => playSoundFile('/sounds/Click.wav', 0.15), [playSoundFile])
   const playClick = useCallback(() => playSoundFile('/sounds/Confirm.wav', 0.2), [playSoundFile])
-  const playModalOpen = useCallback(() => playSoundFile('/sounds/Menu_In.wav', 0.25), [playSoundFile])
+  const playModalOpen = useCallback(() => playSoundFile('/sounds/Door_Slow_Open.wav', 0.25), [playSoundFile])
   const playModalClose = useCallback(() => playSoundFile('/sounds/Menu_Out.wav', 0.25), [playSoundFile])
   const playNavHover = useCallback(() => playSoundFile('/sounds/Click.wav', 0.1), [playSoundFile])
-  const playFilter = useCallback(() => playSoundFile('/sounds/Click.wav', 0.15), [playSoundFile])
+  const playFilter = useCallback(() => playSoundFile('/sounds/Laser_Gun.wav', 0.15), [playSoundFile])
   const playScroll = useCallback(() => playTone(300, 0.08, 'sine', 0.015), [playTone])
-  const playPop = useCallback(() => playSoundFile('/sounds/Click.wav', 0.15), [playSoundFile])
+  const playPop = useCallback(() => playSoundFile('/sounds/Bump.wav', 0.15), [playSoundFile])
   const playWarp = useCallback(() => {
-    // Cool warp/zoom sound — descending sweep
+    // Warp zoom — use Powerup sound + synthesized sweep layered
+    playSoundFile('/sounds/Powerup.wav', 0.2)
     const ctx = getCtx()
     try {
       const osc = ctx.createOscillator()
@@ -108,8 +109,15 @@ function useSoundEffects() {
       osc.start(ctx.currentTime)
       osc.stop(ctx.currentTime + 0.6)
     } catch {}
-  }, [getCtx])
-  const playSuccess = useCallback(() => playSoundFile('/sounds/Confirm.wav', 0.3), [playSoundFile])
+  }, [getCtx, playSoundFile])
+  const playSuccess = useCallback(() => playSoundFile('/sounds/Powerup.wav', 0.3), [playSoundFile])
+  // New sounds for specific actions
+  const playSplash = useCallback(() => playSoundFile('/sounds/Water_Splash.wav', 0.25), [playSoundFile])
+  const playThunder = useCallback(() => playSoundFile('/sounds/Thunder.wav', 0.2), [playSoundFile])
+  const playJump = useCallback(() => playSoundFile('/sounds/Jump.wav', 0.2), [playSoundFile])
+  const playPause = useCallback(() => playSoundFile('/sounds/Pause.wav', 0.2), [playSoundFile])
+  const playSiren = useCallback(() => playSoundFile('/sounds/Siren.wav', 0.15), [playSoundFile])
+  const playExplosion = useCallback(() => playSoundFile('/sounds/Explosion.wav', 0.2), [playSoundFile])
 
   // ============ SIMPLE AMBIENT MUSIC ============
   const musicNodesRef = useRef<any>(null)
@@ -213,7 +221,7 @@ function useSoundEffects() {
     else stopMusic()
   }, [enabled, startMusic, stopMusic])
 
-  return { enabled, setEnabled, playHover, playClick, playModalOpen, playModalClose, playNavHover, playFilter, playScroll, playWarp, playPop, playSuccess }
+  return { enabled, setEnabled, playHover, playClick, playModalOpen, playModalClose, playNavHover, playFilter, playScroll, playWarp, playPop, playSuccess, playSplash, playThunder, playJump, playPause, playSiren, playExplosion }
 }
 
 // ============ ELEGANT 3D OBJECTS (glass + wireframe) ============
@@ -1865,7 +1873,7 @@ export default function Home() {
       {/* ============ SPLASH SCREEN (white + purple, click to enter) ============ */}
       <AnimatePresence>
         {!entered && (
-          <SplashScreen onEnter={() => { setEntered(true); sound.playPop() }} />
+          <SplashScreen onEnter={() => { setEntered(true); sound.playThunder() }} />
         )}
       </AnimatePresence>
 
@@ -1874,7 +1882,7 @@ export default function Home() {
 
       {/* ============ SCROLL WARP OVERLAY ============ */}
       <AnimatePresence>
-        <MorphTransition onMorph={(type) => { if (type === 'warp') sound.playWarp(); else sound.playPop() }} />
+        <MorphTransition onMorph={(type) => { if (type === 'warp') sound.playExplosion(); else sound.playJump() }} />
       </AnimatePresence>
 
       {/* ============ STARRY SPACE BACKGROUND ============ */}
