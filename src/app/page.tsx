@@ -542,25 +542,25 @@ function GradientText({ children, className = '' }: { children: React.ReactNode;
 // ============ FUN POPUP COMMENTS ============
 
 const FUN_MESSAGES = [
-  { text: "Nice scrolling! 👀", emoji: "👀" },
-  { text: "You're crushing it! 💪", emoji: "💪" },
-  { text: "Check out my AI agents! 🤖", emoji: "🤖" },
-  { text: "Did you know I built 4 AI agents? 😎", emoji: "😎" },
-  { text: "Love that you're exploring! ✨", emoji: "✨" },
-  { text: "Almost there... 🔥", emoji: "🔥" },
-  { text: "Pro tip: Click the cards! 👆", emoji: "👆" },
-  { text: "I see you scrolling 🎢", emoji: "🎢" },
-  { text: "Nice taste in portfolios! 😏", emoji: "😏" },
-  { text: "Don't forget to say hi! 👋", emoji: "👋" },
-  { text: "Built with Three.js + Framer Motion ⚡", emoji: "⚡" },
-  { text: "Sound on? 🔊", emoji: "🔊" },
-  { text: "Scroll to the bottom for a surprise! 🎁", emoji: "🎁" },
-  { text: "You found me! 🎉", emoji: "🎉" },
-  { text: "Keep going, you're doing great! 🚀", emoji: "🚀" },
+  { text: "Nice scrolling, traveler! The stars approve." },
+  { text: "You seek knowledge? Ask me anything, brave one." },
+  { text: "Arjun's AI agents are quite impressive, I must say." },
+  { text: "I sense great potential in you, visitor." },
+  { text: "The planets whisper... they like your taste." },
+  { text: "Click me if you dare! I hold many secrets." },
+  { text: "I see you exploring. Good. Curiosity is wisdom." },
+  { text: "Sound on? The silence is... deafening." },
+  { text: "Scroll to the bottom for a magical surprise!" },
+  { text: "You found me! The Goddess greets you." },
+  { text: "Keep going, brave soul. Treasure awaits below." },
+  { text: "I've watched Arjun build for years. Impressive work." },
+  { text: "The code flows like ancient rivers through this site." },
+  { text: "Psst... try clicking the project cards!" },
+  { text: "My portals detect strong developer energy nearby." },
 ]
 
 function FunPopups({ enabled }: { enabled: boolean }) {
-  const [popups, setPopups] = useState<Array<{ id: number; text: string; emoji: string; x: number; y: number }>>([])
+  const [popups, setPopups] = useState<Array<{ id: number; text: string }>>([])
   const idRef = useRef(0)
 
   useEffect(() => {
@@ -568,13 +568,11 @@ function FunPopups({ enabled }: { enabled: boolean }) {
       if (!enabled) return
       const msg = FUN_MESSAGES[Math.floor(Math.random() * FUN_MESSAGES.length)]
       const id = idRef.current++
-      const x = 10 + Math.random() * 80
-      const y = 15 + Math.random() * 60
-      setPopups((prev) => [...prev, { id, ...msg, x, y }])
+      setPopups((prev) => [...prev, { id, text: msg.text }])
       setTimeout(() => {
         setPopups((prev) => prev.filter((p) => p.id !== id))
-      }, 4000)
-    }, 12000) // Every 12 seconds
+      }, 5000)
+    }, 15000) // Every 15 seconds
 
     return () => clearInterval(interval)
   }, [enabled])
@@ -585,19 +583,58 @@ function FunPopups({ enabled }: { enabled: boolean }) {
         {popups.map((popup) => (
           <motion.div
             key={popup.id}
-            initial={{ opacity: 0, scale: 0, rotate: -10, y: 20 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
-            exit={{ opacity: 0, scale: 0, rotate: 10, y: -20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            initial={{ opacity: 0, x: 50, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 50, scale: 0.8 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             style={{
-              position: 'absolute',
-              left: `${popup.x}%`,
-              top: `${popup.y}%`,
+              position: 'fixed',
+              bottom: '180px',
+              right: '140px',
+              maxWidth: '240px',
             }}
-            className="px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl"
           >
-            <span className="text-lg mr-1">{popup.emoji}</span>
-            <span className="text-sm font-medium text-white">{popup.text}</span>
+            {/* Speech bubble — game-style with tail pointing to character */}
+            <div style={{
+              position: 'relative',
+              background: 'rgba(245, 245, 245, 0.95)',
+              border: '2px solid #333',
+              borderRadius: '8px',
+              padding: '10px 14px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+            }}>
+              <p style={{
+                margin: 0,
+                fontSize: '12px',
+                fontFamily: 'var(--font-inter), sans-serif',
+                color: '#222',
+                lineHeight: 1.4,
+                fontWeight: 500,
+              }}>
+                {popup.text}
+              </p>
+              {/* Tail pointing to character (bottom-right) */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-10px',
+                right: '20px',
+                width: '0',
+                height: '0',
+                borderLeft: '8px solid transparent',
+                borderRight: '8px solid transparent',
+                borderTop: '10px solid #333',
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '-7px',
+                right: '22px',
+                width: '0',
+                height: '0',
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderTop: '8px solid rgba(245, 245, 245, 0.95)',
+              }} />
+            </div>
           </motion.div>
         ))}
       </AnimatePresence>
