@@ -594,21 +594,21 @@ function FunPopups({ enabled }: { enabled: boolean }) {
               maxWidth: '220px',
             }}
           >
-            {/* Pixel-art RPG speech bubble — matches Goddess character style */}
+            {/* Pixel-art RPG speech bubble — white bg, black border, matches user's template */}
             <div style={{
               position: 'relative',
-              background: '#1a1a2e',
-              border: '3px solid #b9a3ff',
+              background: '#ffffff',
+              border: '2px solid #000000',
               borderRadius: '0px',
-              padding: '10px 12px',
-              boxShadow: '0 0 0 1px #0a0a0f, 0 4px 12px rgba(138, 43, 226, 0.3)',
+              padding: '8px 12px',
+              boxShadow: '3px 3px 0px #000000',
               imageRendering: 'pixelated',
             }}>
               <p style={{
                 margin: 0,
-                fontSize: '14px',
+                fontSize: '16px',
                 fontFamily: 'var(--font-vt323), "VT323", "JetBrains Mono", monospace',
-                color: '#e0d4ff',
+                color: '#000000',
                 lineHeight: 1.3,
                 fontWeight: 400,
                 letterSpacing: '0.5px',
@@ -618,23 +618,23 @@ function FunPopups({ enabled }: { enabled: boolean }) {
               {/* Pixel-style tail pointing down to character */}
               <div style={{
                 position: 'absolute',
-                bottom: '-9px',
-                right: '15px',
+                bottom: '-10px',
+                right: '20px',
                 width: '0',
                 height: '0',
                 borderLeft: '6px solid transparent',
                 borderRight: '6px solid transparent',
-                borderTop: '9px solid #b9a3ff',
+                borderTop: '10px solid #000000',
               }} />
               <div style={{
                 position: 'absolute',
-                bottom: '-5px',
-                right: '17px',
+                bottom: '-7px',
+                right: '22px',
                 width: '0',
                 height: '0',
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderTop: '6px solid #1a1a2e',
+                borderTop: '7px solid #ffffff',
               }} />
             </div>
           </motion.div>
