@@ -2397,7 +2397,7 @@ export default function Home() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.9])
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [activeFilter, setActiveFilter] = useState('All')
+
   const [mounted, setMounted] = useState(false)
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
   const [entered, setEntered] = useState(false)
@@ -2482,7 +2482,7 @@ export default function Home() {
     return () => { document.body.style.overflow = '' }
   }, [entered])
 
-  const filteredProjects = activeFilter === 'All' ? PROJECTS : PROJECTS.filter(p => p.category === activeFilter)
+
 
   return (
     <SmoothScroll>
@@ -2842,7 +2842,7 @@ export default function Home() {
       {/* ============ PROJECTS SECTION (Nature-themed with 3D forest) ============ */}
       <section id="projects" className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: 'linear-gradient(180deg, #f0f7f0 0%, #e8f5e9 30%, #ffffff 60%)' }}>
         {/* 3D Forest scene — actual KayKit trees, rocks, grass, flowers */}
-        <ForestScene3D />
+
         {/* Forest preview as decorative top strip with parallax */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -2865,17 +2865,6 @@ export default function Home() {
           }}
         />
 
-        {/* Floating nature decorations */}
-        <motion.div
-          animate={{ y: [0, -15, 0], rotate: [0, 3, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute', top: '15%', right: '5%',
-            width: '120px', height: '120px',
-            backgroundImage: 'url(/forest/preview3.jpg)',
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            borderRadius: '20px', opacity: 0.12,
-            filter: 'blur(1px)',
             pointerEvents: 'none', zIndex: 0,
           }}
         />
