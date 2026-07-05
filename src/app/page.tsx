@@ -31,6 +31,41 @@ function useSoundEffects() {
     return audioCtxRef.current
   }, [])
 
+  // Play a real WAV sound file via Web Audio API
+  const soundBuffers = useRef<Record<string, AudioBuffer>>({})
+  const playSoundFile = useCallback((url: string, volume = 0.3) => {
+    if (!enabled) return
+    try {
+      const ctx = getCtx()
+      // Cache the buffer
+      if (soundBuffers.current[url]) {
+        const source = ctx.createBufferSource()
+        const gain = ctx.createGain()
+        gain.gain.value = volume
+        source.buffer = soundBuffers.current[url]
+        source.connect(gain)
+        gain.connect(ctx.destination)
+        source.start()
+        return
+      }
+      // Fetch and decode
+      fetch(url)
+        .then(res => res.arrayBuffer())
+        .then(data => ctx.decodeAudioData(data))
+        .then(buffer => {
+          soundBuffers.current[url] = buffer
+          const source = ctx.createBufferSource()
+          const gain = ctx.createGain()
+          gain.gain.value = volume
+          source.buffer = buffer
+          source.connect(gain)
+          gain.connect(ctx.destination)
+          source.start()
+        })
+        .catch(() => {})
+    } catch {}
+  }, [enabled, getCtx])
+
   const playTone = useCallback((freq: number, duration: number, type: OscillatorType = 'sine', volume = 0.1) => {
     if (!enabled) return
     try {
@@ -48,26 +83,15 @@ function useSoundEffects() {
     } catch {}
   }, [enabled, getCtx])
 
-  const playHover = useCallback(() => playTone(880, 0.05, 'sine', 0.03), [playTone])
-  const playClick = useCallback(() => {
-    playTone(523, 0.08, 'sine', 0.05)
-    setTimeout(() => playTone(784, 0.08, 'sine', 0.04), 50)
-  }, [playTone])
-  const playModalOpen = useCallback(() => {
-    playTone(440, 0.1, 'sine', 0.05)
-    setTimeout(() => playTone(659, 0.1, 'sine', 0.04), 80)
-    setTimeout(() => playTone(880, 0.15, 'sine', 0.03), 160)
-  }, [playTone])
-  const playModalClose = useCallback(() => {
-    playTone(880, 0.1, 'sine', 0.04)
-    setTimeout(() => playTone(440, 0.15, 'sine', 0.03), 80)
-  }, [playTone])
-  const playNavHover = useCallback(() => playTone(1200, 0.03, 'sine', 0.02), [playTone])
-  const playFilter = useCallback(() => {
-    playTone(659, 0.06, 'triangle', 0.04)
-    setTimeout(() => playTone(880, 0.06, 'triangle', 0.03), 40)
-  }, [playTone])
+  // Real WAV sound effects (from user's SweetSounds SFX pack)
+  const playHover = useCallback(() => playSoundFile('/sounds/Click.wav', 0.15), [playSoundFile])
+  const playClick = useCallback(() => playSoundFile('/sounds/Confirm.wav', 0.2), [playSoundFile])
+  const playModalOpen = useCallback(() => playSoundFile('/sounds/Menu_In.wav', 0.25), [playSoundFile])
+  const playModalClose = useCallback(() => playSoundFile('/sounds/Menu_Out.wav', 0.25), [playSoundFile])
+  const playNavHover = useCallback(() => playSoundFile('/sounds/Click.wav', 0.1), [playSoundFile])
+  const playFilter = useCallback(() => playSoundFile('/sounds/Click.wav', 0.15), [playSoundFile])
   const playScroll = useCallback(() => playTone(300, 0.08, 'sine', 0.015), [playTone])
+  const playPop = useCallback(() => playSoundFile('/sounds/Click.wav', 0.15), [playSoundFile])
   const playWarp = useCallback(() => {
     // Cool warp/zoom sound — descending sweep
     const ctx = getCtx()
@@ -85,16 +109,7 @@ function useSoundEffects() {
       osc.stop(ctx.currentTime + 0.6)
     } catch {}
   }, [getCtx])
-  const playPop = useCallback(() => {
-    playTone(1047, 0.04, 'sine', 0.04)
-    setTimeout(() => playTone(1319, 0.06, 'sine', 0.03), 30)
-  }, [playTone])
-  const playSuccess = useCallback(() => {
-    playTone(523, 0.08, 'sine', 0.05)
-    setTimeout(() => playTone(659, 0.08, 'sine', 0.05), 80)
-    setTimeout(() => playTone(784, 0.08, 'sine', 0.05), 160)
-    setTimeout(() => playTone(1047, 0.2, 'sine', 0.04), 240)
-  }, [playTone])
+  const playSuccess = useCallback(() => playSoundFile('/sounds/Confirm.wav', 0.3), [playSoundFile])
 
   // ============ SIMPLE AMBIENT MUSIC ============
   const musicNodesRef = useRef<any>(null)
@@ -1499,6 +1514,54 @@ function StarField() {
   )
 }
 
+// ============ FLOATING PLANETS (visual assets) ============
+// Uses the user's planet PNGs (Ice, Lava, Terran, Baren, Black_hole)
+// Floating in the starry background with slow drift animation.
+
+function FloatingPlanets() {
+  const planets = [
+    { src: '/planets/Lava.png', size: 80, top: '15%', left: '8%', duration: 20, delay: 0 },
+    { src: '/planets/Ice.png', size: 60, top: '60%', left: '85%', duration: 25, delay: 2 },
+    { src: '/planets/Terran.png', size: 100, top: '75%', left: '15%', duration: 30, delay: 5 },
+    { src: '/planets/Baren.png', size: 50, top: '25%', left: '75%', duration: 18, delay: 1 },
+    { src: '/planets/Black_hole.png', size: 70, top: '45%', left: '50%', duration: 35, delay: 8 },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {planets.map((p, i) => (
+        <motion.img
+          key={i}
+          src={p.src}
+          alt=""
+          style={{
+            position: 'absolute',
+            top: p.top,
+            left: p.left,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            objectFit: 'contain',
+            opacity: 0.3,
+            filter: 'drop-shadow(0 0 20px rgba(138, 43, 226, 0.2))',
+          }}
+          animate={{
+            y: [0, -30, 0],
+            x: [0, 15, 0],
+            rotate: [0, 360],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: p.delay,
+            rotate: { duration: p.duration * 2, repeat: Infinity, ease: 'linear' },
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 // ============ PROJECTS TRANSITION (zoom + theme change) ============
 // Cinematic transition inspired by Lenis website:
 // Phase 1 (0 → 0.25): "Liked my agents?" moves from center → upper-left corner
@@ -1824,6 +1887,7 @@ export default function Home() {
       />
       {/* Star field — generated via box-shadow for performance */}
       <StarField />
+      <FloatingPlanets />
 
       {/* ============ RED/BLACK THEME OVERLAY (agents section) ============ */}
       {/* Fades in a deep crimson + pure black background when the agents
