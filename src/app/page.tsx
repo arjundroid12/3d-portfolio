@@ -1250,12 +1250,12 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
     >
       {/* Sticky container — pinned while track scrolls horizontally */}
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center pt-40 pb-8">
-        {/* Section heading — positioned at top with clear gap above cards */}
+        {/* Section heading — positioned below nav bar (nav is ~90px tall at top:26px+52px) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="absolute top-6 left-0 right-0 text-center z-20 pointer-events-none px-6"
+          className="absolute top-24 left-0 right-0 text-center z-20 pointer-events-none px-6"
         >
           <motion.div
             animate={{ opacity: [0.5, 1, 0.5] }}
@@ -1714,10 +1714,27 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
   const [entered, setEntered] = useState(false)
   const [redTheme, setRedTheme] = useState(false)
+  const [navOnWhite, setNavOnWhite] = useState(false)
   const redThemeRef = useRef<HTMLElement>(null)
   const sound = useSoundEffects()
   const heroRef = useRef<HTMLElement>(null)
   const heroInView = useInView(heroRef, { once: true })
+
+  // Track if we've scrolled past the transition to white sections
+  // (projects, about, contact, footer are all white-themed)
+  useEffect(() => {
+    const checkScroll = () => {
+      const projectsSection = document.getElementById('projects')
+      if (projectsSection) {
+        const rect = projectsSection.getBoundingClientRect()
+        // If projects section top is above viewport middle, we're in white territory
+        setNavOnWhite(rect.top < window.innerHeight * 0.5)
+      }
+    }
+    checkScroll()
+    window.addEventListener('scroll', checkScroll, { passive: true })
+    return () => window.removeEventListener('scroll', checkScroll)
+  }, [entered])
 
   // Track scroll progress through the agents section for smooth red theme fade
   // The red overlay opacity is driven by scroll position, not a boolean toggle
@@ -1832,7 +1849,7 @@ export default function Home() {
         }}
       />
 
-      {/* ============ PREMIUM LIQUID GLASS NAV BAR ============ */}
+      {/* ============ PREMIUM LIQUID GLASS NAV BAR (adaptive for dark/white) ============ */}
       <motion.nav
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -1868,16 +1885,21 @@ export default function Home() {
             padding: '0 7px 0 22px',
             borderRadius: '28px',
             overflow: 'hidden',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004) 45%, rgba(255,255,255,0.012))',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.32), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -1px 1.5px rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.19), 0 0 0 1px rgba(255,255,255,0.045)',
+            background: navOnWhite
+              ? 'linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.9))'
+              : 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004) 45%, rgba(255,255,255,0.012))',
+            boxShadow: navOnWhite
+              ? '0 10px 30px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(0,0,0,0.06)'
+              : '0 10px 30px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.32), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -1px 1.5px rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.19), 0 0 0 1px rgba(255,255,255,0.045)',
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            transition: 'background 0.4s ease, box-shadow 0.4s ease',
           } as React.CSSProperties}
         >
           {/* Top sheen */}
-          <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 16%, transparent 85%, rgba(255,255,255,0.014) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', background: navOnWhite ? 'linear-gradient(to bottom, rgba(255,255,255,0.5) 0%, transparent 16%, transparent 85%, rgba(0,0,0,0.02) 100%)' : 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 16%, transparent 85%, rgba(255,255,255,0.014) 100%)' }} />
           {/* Mouse-follow glow */}
-          <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', mixBlendMode: 'screen', background: 'radial-gradient(140px 78px at var(--mx) var(--my), rgba(255,255,255,0.1), rgba(255,255,255,0.02) 48%, transparent 70%)', transition: 'background 0.12s ease' }} />
+          <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', mixBlendMode: navOnWhite ? 'multiply' : 'screen', background: 'radial-gradient(140px 78px at var(--mx) var(--my), rgba(255,255,255,0.1), rgba(255,255,255,0.02) 48%, transparent 70%)', transition: 'background 0.12s ease' }} />
           {/* Bottom gradient line */}
           <div style={{ position: 'absolute', left: '8%', right: '8%', bottom: '4px', height: '2px', pointerEvents: 'none', opacity: 0.5, background: 'linear-gradient(90deg, transparent, rgba(255,120,175,0.55) 28%, rgba(125,165,255,0.55) 50%, rgba(125,255,205,0.45) 70%, transparent)', filter: 'blur(1.5px)' }} />
           {/* Shimmer */}
@@ -1886,7 +1908,7 @@ export default function Home() {
           {/* Content */}
           <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', flexWrap: 'nowrap', width: '100%', gap: '10px' }}>
             {/* Logo */}
-            <a href="#hero" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, fontWeight: 600, fontSize: '17px', letterSpacing: '-0.5px', textDecoration: 'none', color: '#b9a3ff', textShadow: '0 0 18px rgba(185,163,255,0.55)' }}>
+            <a href="#hero" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, fontWeight: 600, fontSize: '17px', letterSpacing: '-0.5px', textDecoration: 'none', color: navOnWhite ? '#6d28d9' : '#b9a3ff', textShadow: navOnWhite ? 'none' : '0 0 18px rgba(185,163,255,0.55)', transition: 'color 0.4s ease' }}>
               &lt;arjun/&gt;
             </a>
 
@@ -1903,11 +1925,11 @@ export default function Home() {
                   style={{
                     position: 'relative', zIndex: 1, padding: '7px 13px',
                     fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap',
-                    color: 'rgba(233,231,242,0.72)', textDecoration: 'none',
-                    cursor: 'pointer', transition: 'color 0.2s ease',
+                    color: navOnWhite ? 'rgba(30,30,40,0.65)' : 'rgba(233,231,242,0.72)',
+                    textDecoration: 'none', cursor: 'pointer', transition: 'color 0.3s ease',
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.color = '#ffffff'}
-                  onMouseOut={(e) => e.currentTarget.style.color = 'rgba(233,231,242,0.72)'}
+                  onMouseOver={(e) => e.currentTarget.style.color = navOnWhite ? '#000000' : '#ffffff'}
+                  onMouseOut={(e) => e.currentTarget.style.color = navOnWhite ? 'rgba(30,30,40,0.65)' : 'rgba(233,231,242,0.72)'}
                 >
                   {item}
                 </a>
@@ -1924,14 +1946,19 @@ export default function Home() {
               style={{
                 display: 'flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap',
                 gap: '7px', height: '34px', marginLeft: '6px', padding: '0 15px',
-                borderRadius: '17px', fontSize: '12.5px', fontWeight: 600, color: '#fff',
+                borderRadius: '17px', fontSize: '12.5px', fontWeight: 600,
+                color: navOnWhite ? '#1a1a2e' : '#fff',
                 textDecoration: 'none', cursor: 'pointer',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05))',
-                boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.14), 0 2px 10px rgba(0,0,0,0.3)',
-                transition: 'transform 0.2s ease, background 0.2s ease',
+                background: navOnWhite
+                  ? 'linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02))'
+                  : 'linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05))',
+                boxShadow: navOnWhite
+                  ? 'inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(0,0,0,0.08)'
+                  : 'inset 0 1px 1px rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.14), 0 2px 10px rgba(0,0,0,0.3)',
+                transition: 'transform 0.2s ease, background 0.3s ease, color 0.3s ease',
               }}
-              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.24), rgba(255,255,255,0.09))' }}
-              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05))' }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = navOnWhite ? 'linear-gradient(135deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04))' : 'linear-gradient(135deg, rgba(255,255,255,0.24), rgba(255,255,255,0.09))' }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = navOnWhite ? 'linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02))' : 'linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05))' }}
             >
               <Github className="w-4 h-4" /> GitHub
             </a>
@@ -1947,14 +1974,18 @@ export default function Home() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 width: '38px', height: '38px', marginLeft: '5px', padding: 0, border: 'none',
                 borderRadius: '50%', cursor: 'pointer',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))',
-                boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.12), 0 2px 10px rgba(0,0,0,0.28)',
-                transition: 'transform 0.2s ease, background 0.2s ease',
+                background: navOnWhite
+                  ? 'linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.01))'
+                  : 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))',
+                boxShadow: navOnWhite
+                  ? 'inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(0,0,0,0.06)'
+                  : 'inset 0 1px 1px rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.12), 0 2px 10px rgba(0,0,0,0.28)',
+                transition: 'transform 0.2s ease, background 0.3s ease',
               }}
-              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08))' }}
-              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))' }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = navOnWhite ? 'linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.03))' : 'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08))' }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = navOnWhite ? 'linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.01))' : 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))' }}
             >
-              {sound.enabled ? <Volume2 className="w-4 h-4 text-white" /> : <VolumeX className="w-4 h-4 text-white" />}
+              {sound.enabled ? <Volume2 className="w-4 h-4" style={{ color: navOnWhite ? '#1a1a2e' : '#fff', transition: 'color 0.3s ease' }} /> : <VolumeX className="w-4 h-4" style={{ color: navOnWhite ? '#1a1a2e' : '#fff', transition: 'color 0.3s ease' }} />}
             </button>
           </div>
         </div>
