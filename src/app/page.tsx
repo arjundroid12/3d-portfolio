@@ -1109,8 +1109,8 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
           style={{
             fontFamily: '"Tanker", "TrenchSlab", sans-serif',
             color: '#ffffff',
-            fontSize: 'clamp(56px, 10vw, 140px)',
-            fontWeight: 400,
+            fontSize: 'clamp(96px, 18vw, 260px)',
+            fontWeight: 700,
             lineHeight: 0.9,
             letterSpacing: '-0.02em',
             textTransform: 'uppercase',
