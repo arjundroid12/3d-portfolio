@@ -2199,6 +2199,197 @@ function AIChatWidget({ sound }: { sound: any }) {
   )
 }
 
+// ============ PROJECT WHEEL — half-wheel showcase ============
+// Large wheel positioned at left edge (half off-screen).
+// Project cards mounted around the circumference.
+// Scroll rotates the wheel, bringing cards into view.
+
+function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound: any; onCardClick: (p: any) => void }) {
+  const wheelRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const [rotation, setRotation] = useState(0)
+  const [progress, setProgress] = useState(0)
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  })
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 60,
+    damping: 25,
+    restDelta: 0.001,
+  })
+
+  useEffect(() => {
+    return smoothProgress.on('change', (v) => {
+      // Rotate 360° over the full scroll
+      const rot = v * 360
+      setRotation(rot)
+      setProgress(Math.min(projects.length, Math.floor(v * projects.length) + 1))
+
+      // Update progress bar
+      const bar = document.getElementById('wheel-progress-bar')
+      if (bar) {
+        bar.style.width = `${v * 100}%`
+      }
+      const text = document.getElementById('wheel-progress-text')
+      if (text) {
+        const current = Math.min(projects.length, Math.floor(v * projects.length) + 1)
+        text.textContent = `${current} / ${projects.length}`
+      }
+    })
+  }, [smoothProgress, projects.length])
+
+  const radius = 420  // wheel radius in px
+  const cardAngle = 360 / projects.length  // angle between cards (30° for 12)
+
+  return (
+    <div ref={sectionRef} className="relative w-full h-full flex items-center justify-center" style={{ pointerEvents: 'none' }}>
+      {/* Wheel container — center at left edge of screen */}
+      <div
+        className="absolute"
+        style={{
+          left: '-380px',  // off-screen left (half the wheel hidden)
+          top: '50%',
+          width: `${radius * 2}px`,
+          height: `${radius * 2}px`,
+          marginLeft: `-${radius}px`,
+          marginTop: `-${radius}px`,
+          transform: `rotate(${rotation}deg)`,
+          transition: 'none',
+        }}
+      >
+        {/* Wheel rim — subtle visible circle */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0',
+            borderRadius: '50%',
+            border: '2px dashed rgba(76, 175, 80, 0.2)',
+            background: 'radial-gradient(circle, rgba(232, 245, 233, 0.3) 0%, transparent 70%)',
+          }}
+        />
+        {/* Inner rim */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: '40px',
+            borderRadius: '50%',
+            border: '1px solid rgba(76, 175, 80, 0.15)',
+          }}
+        />
+        {/* Center hub */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #4caf50, #81c784)',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <span style={{ fontSize: '24px' }}>🌿</span>
+        </div>
+
+        {/* Cards mounted on the wheel */}
+        {projects.map((project, i) => {
+          const angle = i * cardAngle - 90  // start at top (-90°)
+          // Position card on the circle
+          const x = Math.cos((angle * Math.PI) / 180) * radius
+          const y = Math.sin((angle * Math.PI) / 180) * radius
+
+          return (
+            <div
+              key={project.name}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                // Move to position on circle, then counter-rotate to stay upright
+                transform: `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${-rotation}deg)`,
+                pointerEvents: 'auto',
+              }}
+            >
+              {/* Project card */}
+              <motion.div
+                whileHover={{ scale: 1.08, y: -4 }}
+                whileTap={{ scale: 0.97 }}
+                onMouseEnter={() => sound.playHover()}
+                onClick={() => { sound.playClick(); onCardClick(project) }}
+                style={{
+                  width: '240px',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(76, 175, 80, 0.2)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
+                  cursor: 'pointer',
+                  transition: 'box-shadow 0.3s ease',
+                }}
+              >
+                {/* Card content */}
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-3xl">{project.icon}</span>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900">{project.name}</h3>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{project.category}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed mb-3" style={{ maxHeight: '3em', overflow: 'hidden' }}>
+                  {project.desc}
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {project.tech.slice(0, 3).map((t: string) => (
+                    <span key={t} className="text-[9px] px-1.5 py-0.5 bg-green-50 rounded text-green-700 font-mono border border-green-100">
+                      {t}
+                    </span>
+                  ))}
+                  {project.tech.length > 3 && (
+                    <span className="text-[9px] px-1.5 py-0.5 text-gray-400 font-mono">+{project.tech.length - 3}</span>
+                  )}
+                </div>
+                {/* Spoke line connecting card to center */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: `${radius}px`,
+                  height: '1px',
+                  background: 'rgba(76, 175, 80, 0.1)',
+                  transformOrigin: '0 0',
+                  transform: `rotate(${angle + 90}deg) translateX(-50%)`,
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                }} />
+              </motion.div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Mask gradient — fade out cards on the left (off-screen) side */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: '0',
+          background: 'linear-gradient(90deg, rgba(240, 247, 240, 1) 0%, rgba(240, 247, 240, 0) 25%, rgba(240, 247, 240, 0) 75%, rgba(240, 247, 240, 0.8) 100%)',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}
+      />
+    </div>
+  )
+}
+
 // ============ MAIN PAGE ============
 
 export default function Home() {
@@ -2505,140 +2696,95 @@ export default function Home() {
             transition={{ delay: 0.2, duration: 1, type: 'spring' }}
             className="relative w-36 h-36 md:w-44 md:h-44 mx-auto mb-8"
           >
-            {/* Rotating gradient ring */}
             <motion.div
               className="absolute inset-0 rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-              style={{
-                background: 'conic-gradient(from 0deg, #14b8a6, #fbbf24, #a855f7, #f97316, #14b8a6)',
-                padding: 4,
-              }}
+              style={{ background: 'conic-gradient(from 0deg, #14b8a6, #fbbf24, #a855f7, #f97316, #14b8a6)', padding: 4 }}
             >
               <div className="w-full h-full rounded-full bg-[#0a0a0f]" />
             </motion.div>
-            {/* Inner photo */}
             <div className="absolute inset-2 rounded-full bg-gradient-to-br from-teal-500/20 to-amber-500/20 backdrop-blur-xl border border-white/10 overflow-hidden">
-              <motion.img
-                src="/photo.jpg"
-                alt="Arjun Vashishtha"
-                initial={{ scale: 1.15, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full h-full object-cover"
-                style={{ objectPosition: 'center top' }}
-              />
+              <motion.img src="/photo.jpg" alt="Arjun Vashishtha" initial={{ scale: 1.15, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="w-full h-full object-cover" style={{ objectPosition: 'center top' }} />
             </div>
-            {/* Pulsing glow */}
-            <motion.div
-              className="absolute inset-0 rounded-full blur-2xl -z-10"
-              animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              style={{ background: 'radial-gradient(circle, rgba(20,184,166,0.4), transparent 70%)' }}
-            />
+            <motion.div className="absolute inset-0 rounded-full blur-2xl -z-10" animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }} transition={{ duration: 3, repeat: Infinity }} style={{ background: 'radial-gradient(circle, rgba(20,184,166,0.4), transparent 70%)' }} />
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-indigo-500/10 border border-indigo-500/30"
-          >
+          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4, duration: 0.6 }} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-indigo-500/10 border border-indigo-500/30">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-sm font-mono text-indigo-400">Available for opportunities</span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-white"
-            style={{ fontFamily: '"TrenchSlab", sans-serif' }}
-          >
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.8 }} className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-white" style={{ fontFamily: '"TrenchSlab", sans-serif' }}>
             Arjun Vashishtha
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-            className="text-xl md:text-2xl mb-4 font-mono text-white/70"
-          >
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.6 }} className="text-xl md:text-2xl mb-4 font-mono text-white/70">
             Software Management · Data Science · AI Builder
           </motion.p>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="text-base md:text-lg text-white/50 max-w-2xl mx-auto mb-10"
-          >
-            4th-year B.Tech CSE student at VIT Bhopal. Building autonomous AI agents,
-            full-stack apps, and data-driven solutions.
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.6 }} className="text-base md:text-lg text-white/50 max-w-2xl mx-auto mb-10">
+            4th-year B.Tech CSE student at VIT Bhopal. Building autonomous AI agents, full-stack apps, and data-driven solutions.
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.6 }}
-            className="flex flex-wrap gap-3 justify-center mb-10"
-          >
-            <motion.a
-              href="#agents"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onMouseEnter={() => sound.playHover()}
-              onClick={() => sound.playClick()}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
-            >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.6 }} className="flex flex-wrap gap-3 justify-center mb-10">
+            <motion.a href="#agents" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }} onMouseEnter={() => sound.playHover()} onClick={() => sound.playClick()} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}>
               <Brain className="w-4 h-4" /> Explore AI Agents
             </motion.a>
-            <motion.a
-              href="#projects"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onMouseEnter={() => sound.playHover()}
-              onClick={() => sound.playClick()}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white border border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10"
-            >
+            <motion.a href="#projects" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }} onMouseEnter={() => sound.playHover()} onClick={() => sound.playClick()} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white border border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10">
               <Rocket className="w-4 h-4" /> View Projects
             </motion.a>
-            <motion.a
-              href="/resume.pdf"
-              download
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onMouseEnter={() => sound.playHover()}
-              onClick={() => sound.playClick()}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white/70 border border-white/10 bg-white/[0.02] hover:bg-white/5"
-            >
+            <motion.a href="/resume.pdf" download whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }} onMouseEnter={() => sound.playHover()} onClick={() => sound.playClick()} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white/70 border border-white/10 bg-white/[0.02] hover:bg-white/5">
               <Download className="w-4 h-4" /> Resume
             </motion.a>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.3 }}
-            className="flex flex-wrap gap-3 justify-center"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }} className="flex flex-wrap gap-3 justify-center">
             {['Python', 'React', 'Next.js', 'Cerebras', 'Power BI', 'MySQL', 'Three.js'].map((tech, i) => (
-              <motion.span
-                key={tech}
-                initial={{ opacity: 0, scale: 0, rotateZ: -20 }}
-                animate={{ opacity: 1, scale: 1, rotateZ: 0 }}
-                transition={{ delay: 1.3 + i * 0.1, type: 'spring' }}
-                whileHover={{ scale: 1.15, y: -5, rotateZ: 5 }}
-                onMouseEnter={() => sound.playHover()}
-                className="px-3 py-1 text-xs font-mono text-white/60 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-sm cursor-pointer"
-              >
+              <motion.span key={tech} initial={{ opacity: 0, scale: 0, rotateZ: -20 }} animate={{ opacity: 1, scale: 1, rotateZ: 0 }} transition={{ delay: 1.3 + i * 0.1, type: 'spring' }} whileHover={{ scale: 1.15, y: -5, rotateZ: 5 }} onMouseEnter={() => sound.playHover()} className="px-3 py-1 text-xs font-mono text-white/60 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-sm cursor-pointer">
                 {tech}
               </motion.span>
             ))}
           </motion.div>
         </div>
       </motion.section>
+
+      {/* ============ PROJECTS SECTION — WHEEL SHOWCASE ============ */}
+      <section id="projects" className="relative z-10 overflow-hidden" style={{ background: 'linear-gradient(180deg, #f0f7f0 0%, #e8f5e9 30%, #ffffff 60%)', height: '400vh' }}>
+        {/* Sticky container — wheel stays pinned while scrolling */}
+        <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
+          {/* Heading */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-8 z-20 relative"
+          >
+            <Badge variant="secondary" className="mb-3 bg-green-100 text-green-700 border-green-300 font-mono">{"// portfolio"}</Badge>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-2 text-gray-900" style={{ fontFamily: '"Array", "TrenchSlab", sans-serif' }}>
+              Projects
+            </h2>
+            <p className="text-gray-600 text-sm">Scroll to spin the wheel</p>
+          </motion.div>
+
+          {/* The Wheel */}
+          <ProjectWheel projects={PROJECTS} sound={sound} onCardClick={handleProjectClick} />
+
+          {/* Progress arc indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+            <div className="w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{
+                  background: 'linear-gradient(90deg, #4caf50, #81c784, #4caf50)',
+                }}
+                id="wheel-progress-bar"
+              />
+            </div>
+            <span className="text-xs font-mono text-gray-500" id="wheel-progress-text">0 / 12</span>
+          </div>
+        </div>
+      </section>
 
       {/* ============ AI AGENTS SECTION — HORIZONTAL PINNED SCROLL ============ */}
       {/* Wrapper with ref for scroll-driven red theme fade */}
@@ -2649,116 +2795,6 @@ export default function Home() {
       {/* ============ TRANSITION: ZOOM INTO "PROJECTS" + THEME CHANGE ============ */}
       <ProjectsTransition />
 
-      {/* ============ PROJECTS SECTION (Nature-themed with 3D forest) ============ */}
-      <section id="projects" className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: 'linear-gradient(180deg, #f0f7f0 0%, #e8f5e9 30%, #ffffff 60%)' }}>
-        {/* 3D Forest scene — actual KayKit trees, rocks, grass, flowers */}
-        <ForestScene3D />
-        {/* Forest preview as decorative top strip with parallax */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.15 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5 }}
-          style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            right: '0',
-            height: '300px',
-            backgroundImage: 'url(/forest/preview1.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top',
-            maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-
-        {/* Floating nature decorations */}
-        <motion.div
-          animate={{ y: [0, -15, 0], rotate: [0, 3, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute', top: '15%', right: '5%',
-            width: '120px', height: '120px',
-            backgroundImage: 'url(/forest/preview3.jpg)',
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            borderRadius: '20px', opacity: 0.12,
-            filter: 'blur(1px)',
-            pointerEvents: 'none', zIndex: 0,
-          }}
-        />
-        <motion.div
-          animate={{ y: [0, 20, 0], rotate: [0, -2, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          style={{
-            position: 'absolute', bottom: '10%', left: '3%',
-            width: '100px', height: '100px',
-            backgroundImage: 'url(/forest/preview2.jpg)',
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            borderRadius: '16px', opacity: 0.1,
-            filter: 'blur(1px)',
-            pointerEvents: 'none', zIndex: 0,
-          }}
-        />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <Badge variant="secondary" className="mb-4 bg-green-100 text-green-700 border-green-300 font-mono">{"// portfolio"}</Badge>
-            <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-4 text-gray-900" style={{ fontFamily: '"Array", "TrenchSlab", sans-serif' }}>
-              Projects
-            </h2>
-            <p className="text-gray-600 text-lg">{PROJECTS.length}+ projects built — growing like a forest</p>
-          </motion.div>
-
-          {/* Filter buttons */}
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
-            {['All', 'AI/ML', 'Frontend', 'Full-stack', 'Backend'].map((cat) => (
-              <motion.button
-                key={cat}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => { setActiveFilter(cat); sound.playFilter() }}
-                onMouseEnter={() => sound.playNavHover()}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  activeFilter === cat
-                    ? 'bg-teal-500 text-white border border-teal-600'
-                    : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
-                }`}
-              >
-                {cat}
-                <span className="ml-1.5 opacity-60">
-                  {cat === 'All' ? PROJECTS.length : PROJECTS.filter(p => p.category === cat).length}
-                </span>
-              </motion.button>
-            ))}
-          </div>
-
-          {/* Projects grid with 3D tilt */}
-          <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project) => (
-                <motion.div
-                  key={project.name}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <TiltCard project={project} onClick={() => handleProjectClick(project)} onHover={() => sound.playHover()} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-      </section>
 
       {/* ============ ABOUT SECTION ============ */}
       <section id="about" className="relative z-10 py-24 px-6" style={{ background: '#ffffff' }}>
