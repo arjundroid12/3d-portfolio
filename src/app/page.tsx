@@ -1832,56 +1832,130 @@ export default function Home() {
         }}
       />
 
-      {/* ============ NAV ============ */}
+      {/* ============ PREMIUM LIQUID GLASS NAV BAR ============ */}
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50 liquid-glass-nav"
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: 'fixed',
+          top: '26px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'calc(100% - 44px)',
+          maxWidth: '1140px',
+          zIndex: 50,
+        }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <motion.a
-            href="#hero"
-            whileHover={{ scale: 1.05 }}
-            className="font-mono text-lg font-bold"
-            style={{ background: 'linear-gradient(90deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
-          >
-            &lt;arjun/&gt;
-          </motion.a>
-          <div className="hidden md:flex items-center gap-2">
-            {['Agents', 'Projects', 'About', 'Contact'].map((item) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                whileHover={{ scale: 1.05, y: -2 }}
-                onMouseEnter={() => sound.playNavHover()}
-                onClick={() => sound.playClick()}
-                className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
-              >
-                {item}
-              </motion.a>
-            ))}
-            <Button size="sm" variant="outline" className="ml-2 border-white/20 bg-white/5 text-white hover:bg-white/10" asChild onMouseEnter={() => sound.playNavHover()} onClick={() => sound.playClick()}>
-              <a href="https://github.com/arjundroid12" target="_blank" rel="noopener">
-                <Github className="w-4 h-4 mr-2" /> GitHub
-              </a>
-            </Button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                if (!sound.enabled) {
-                  sound.setEnabled(true)
-                  setTimeout(() => sound.playClick(), 100)
-                } else {
-                  sound.setEnabled(false)
-                }
+        <div
+          onMouseMove={(e) => {
+            const el = e.currentTarget
+            const r = el.getBoundingClientRect()
+            el.style.setProperty('--mx', (e.clientX - r.left) + 'px')
+            el.style.setProperty('--my', (e.clientY - r.top) + 'px')
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.setProperty('--mx', '50%')
+            e.currentTarget.style.setProperty('--my', '-30px')
+          }}
+          style={{
+            '--mx': '50%',
+            '--my': '-30px',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            height: '52px',
+            padding: '0 7px 0 22px',
+            borderRadius: '28px',
+            overflow: 'hidden',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004) 45%, rgba(255,255,255,0.012))',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.32), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -1px 1.5px rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.19), 0 0 0 1px rgba(255,255,255,0.045)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          } as React.CSSProperties}
+        >
+          {/* Top sheen */}
+          <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 16%, transparent 85%, rgba(255,255,255,0.014) 100%)' }} />
+          {/* Mouse-follow glow */}
+          <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none', mixBlendMode: 'screen', background: 'radial-gradient(140px 78px at var(--mx) var(--my), rgba(255,255,255,0.1), rgba(255,255,255,0.02) 48%, transparent 70%)', transition: 'background 0.12s ease' }} />
+          {/* Bottom gradient line */}
+          <div style={{ position: 'absolute', left: '8%', right: '8%', bottom: '4px', height: '2px', pointerEvents: 'none', opacity: 0.5, background: 'linear-gradient(90deg, transparent, rgba(255,120,175,0.55) 28%, rgba(125,165,255,0.55) 50%, rgba(125,255,205,0.45) 70%, transparent)', filter: 'blur(1.5px)' }} />
+          {/* Shimmer */}
+          <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: '36%', pointerEvents: 'none', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)', animation: 'shimmerMove 8s ease-in-out infinite' }} />
+
+          {/* Content */}
+          <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', flexWrap: 'nowrap', width: '100%', gap: '10px' }}>
+            {/* Logo */}
+            <a href="#hero" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, fontWeight: 600, fontSize: '17px', letterSpacing: '-0.5px', textDecoration: 'none', color: '#b9a3ff', textShadow: '0 0 18px rgba(185,163,255,0.55)' }}>
+              &lt;arjun/&gt;
+            </a>
+
+            <div style={{ flex: 1 }} />
+
+            {/* Nav links */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0, gap: '2px' }}>
+              {['Agents', 'Projects', 'About', 'Contact'].map((item) => (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  onMouseEnter={() => sound.playNavHover()}
+                  onClick={() => sound.playClick()}
+                  style={{
+                    position: 'relative', zIndex: 1, padding: '7px 13px',
+                    fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap',
+                    color: 'rgba(233,231,242,0.72)', textDecoration: 'none',
+                    cursor: 'pointer', transition: 'color 0.2s ease',
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.color = '#ffffff'}
+                  onMouseOut={(e) => e.currentTarget.style.color = 'rgba(233,231,242,0.72)'}
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
+
+            {/* GitHub button */}
+            <a
+              href="https://github.com/arjundroid12"
+              target="_blank"
+              rel="noopener"
+              onMouseEnter={() => sound.playNavHover()}
+              onClick={() => sound.playClick()}
+              style={{
+                display: 'flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap',
+                gap: '7px', height: '34px', marginLeft: '6px', padding: '0 15px',
+                borderRadius: '17px', fontSize: '12.5px', fontWeight: 600, color: '#fff',
+                textDecoration: 'none', cursor: 'pointer',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05))',
+                boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.14), 0 2px 10px rgba(0,0,0,0.3)',
+                transition: 'transform 0.2s ease, background 0.2s ease',
               }}
-              className="ml-2 p-2 rounded-lg border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-colors"
-              title={sound.enabled ? "Sound is ON — click to mute" : "Sound is muted — click to enable"}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.24), rgba(255,255,255,0.09))' }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05))' }}
             >
-              {sound.enabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            </motion.button>
+              <Github className="w-4 h-4" /> GitHub
+            </a>
+
+            {/* Sound toggle */}
+            <button
+              onClick={() => {
+                if (!sound.enabled) { sound.setEnabled(true); setTimeout(() => sound.playClick(), 100) }
+                else { sound.setEnabled(false) }
+              }}
+              aria-label="Toggle sound"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                width: '38px', height: '38px', marginLeft: '5px', padding: 0, border: 'none',
+                borderRadius: '50%', cursor: 'pointer',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))',
+                boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.12), 0 2px 10px rgba(0,0,0,0.28)',
+                transition: 'transform 0.2s ease, background 0.2s ease',
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08))' }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))' }}
+            >
+              {sound.enabled ? <Volume2 className="w-4 h-4 text-white" /> : <VolumeX className="w-4 h-4 text-white" />}
+            </button>
           </div>
         </div>
       </motion.nav>
@@ -1969,42 +2043,48 @@ export default function Home() {
             transition={{ delay: 0.8, duration: 0.6 }}
             className="text-base md:text-lg text-white/50 max-w-2xl mx-auto mb-10"
           >
-            4th-year B.Tech CSE student at VIT Bhopal, currently at Techify Inc.
-            Building autonomous AI agents, full-stack apps, and data-driven solutions.
+            4th-year B.Tech CSE student at VIT Bhopal. Building autonomous AI agents,
+            full-stack apps, and data-driven solutions.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.6 }}
-            className="flex flex-wrap gap-4 justify-center mb-16"
+            className="flex flex-wrap gap-3 justify-center mb-10"
           >
-            <MagneticButton
-              size="lg"
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0"
-              asChild
+            <motion.a
+              href="#agents"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onMouseEnter={() => sound.playHover()}
               onClick={() => sound.playClick()}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
             >
-              <a href="#agents"><Brain className="w-4 h-4 mr-2" /> Explore AI Agents</a>
-            </MagneticButton>
-            <MagneticButton
-              size="lg"
-              variant="outline"
-              className="border-white/20 bg-white/5 text-white hover:bg-white/10"
-              asChild
+              <Brain className="w-4 h-4" /> Explore AI Agents
+            </motion.a>
+            <motion.a
+              href="#projects"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onMouseEnter={() => sound.playHover()}
               onClick={() => sound.playClick()}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white border border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10"
             >
-              <a href="#projects"><Rocket className="w-4 h-4 mr-2" /> View Projects</a>
-            </MagneticButton>
-            <MagneticButton
-              size="lg"
-              variant="outline"
-              className="border-white/20 bg-white/5 text-white hover:bg-white/10"
-              asChild
+              <Rocket className="w-4 h-4" /> View Projects
+            </motion.a>
+            <motion.a
+              href="/resume.pdf"
+              download
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onMouseEnter={() => sound.playHover()}
               onClick={() => sound.playClick()}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white/70 border border-white/10 bg-white/[0.02] hover:bg-white/5"
             >
-              <a href="/resume.pdf" download><Download className="w-4 h-4 mr-2" /> Resume</a>
-            </MagneticButton>
+              <Download className="w-4 h-4" /> Resume
+            </motion.a>
           </motion.div>
 
           <motion.div
@@ -2028,7 +2108,6 @@ export default function Home() {
             ))}
           </motion.div>
         </div>
-
       </motion.section>
 
       {/* ============ AI AGENTS SECTION — HORIZONTAL PINNED SCROLL ============ */}
