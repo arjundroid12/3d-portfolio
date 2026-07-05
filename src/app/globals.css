@@ -338,3 +338,21 @@ html {
   font-style: normal;
   font-display: swap;
 }
+
+/* ============ TRENCH SLAB — Custom Display Font ============ */
+@font-face {
+  font-family: 'TrenchSlab';
+  src: url('/fonts/TrenchSlab-Bold.woff2') format('woff2'),
+       url('/fonts/TrenchSlab-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'TrenchSlab';
+  src: url('/fonts/TrenchSlab-Regular.woff2') format('woff2'),
+       url('/fonts/TrenchSlab-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

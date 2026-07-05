@@ -1107,7 +1107,7 @@ function SplashScreen({ onEnter }: { onEnter: () => void }) {
         <motion.h1
           className="select-none"
           style={{
-            fontFamily: '"Merinda", "Bebas Neue", sans-serif',
+            fontFamily: '"TrenchSlab", "Merinda", sans-serif',
             color: '#ffffff',
             fontSize: 'clamp(56px, 10vw, 140px)',
             fontWeight: 400,
@@ -1266,7 +1266,7 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
           </motion.div>
           <h2
             className="text-4xl md:text-5xl font-bold mb-1 bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
-            style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
+            style={{ fontFamily: '"TrenchSlab", sans-serif' }}
           >
             AI Agents
           </h2>
@@ -1359,7 +1359,7 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
                   <h3
                     style={{
                       margin: '0 0 6px',
-                      font: '700 28px/1.1 var(--font-playfair), Playfair Display, serif',
+                      font: '700 28px/1.1 "TrenchSlab", sans-serif',
                       color: '#fff', letterSpacing: '-0.02em',
                     }}
                   >
@@ -1949,18 +1949,19 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6"
+            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-white"
+            style={{ fontFamily: '"TrenchSlab", sans-serif' }}
           >
-            <GradientText>Arjun Vashishtha</GradientText>
+            Arjun Vashishtha
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
-            className="text-xl md:text-2xl mb-4 font-mono"
+            className="text-xl md:text-2xl mb-4 font-mono text-white/70"
           >
-            <GradientText>Software Management · Data Science · AI Builder</GradientText>
+            Software Management · Data Science · AI Builder
           </motion.p>
 
           <motion.p
@@ -2050,7 +2051,7 @@ export default function Home() {
             className="text-center mb-12"
           >
             <Badge variant="secondary" className="mb-4 bg-purple-100 text-purple-700 border-purple-300 font-mono">{"// portfolio"}</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent" style={{ fontFamily: '"TrenchSlab", sans-serif' }}>
               Projects
             </h2>
             <p className="text-gray-500">{PROJECTS.length}+ projects built</p>
@@ -2109,7 +2110,7 @@ export default function Home() {
             className="text-center mb-16"
           >
             <Badge variant="secondary" className="mb-4 bg-cyan-100 text-cyan-700 border-cyan-300 font-mono">{"// about me"}</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent" style={{ fontFamily: '"TrenchSlab", sans-serif' }}>
               About Me
             </h2>
           </motion.div>
@@ -2180,7 +2181,7 @@ export default function Home() {
             className="text-center mb-16"
           >
             <Badge variant="secondary" className="mb-4 bg-purple-100 text-purple-700 border-purple-300 font-mono">{"// let's connect"}</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent" style={{ fontFamily: '"TrenchSlab", sans-serif' }}>
               Get In Touch
             </h2>
             <p className="text-gray-500">Open to opportunities, collaborations, and AI conversations</p>
