@@ -2231,35 +2231,35 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick }: {
       >
         <div
           style={{
-            width: '220px',
+            width: '260px',
             background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(76, 175, 80, 0.25)',
             borderRadius: '14px',
-            padding: '14px',
+            padding: '16px',
             boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
             cursor: 'pointer',
             transition: 'box-shadow 0.3s ease',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '28px' }}>{project.icon}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            <span style={{ fontSize: '32px' }}>{project.icon}</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>{project.name}</h3>
-              <span style={{ fontSize: '9px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{project.category}</span>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#1a1a2e' }}>{project.name}</h3>
+              <span style={{ fontSize: '10px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{project.category}</span>
             </div>
           </div>
-          <p style={{ margin: '0 0 8px 0', fontSize: '11px', color: '#555', lineHeight: 1.4, maxHeight: '2.8em', overflow: 'hidden' }}>
+          <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#555', lineHeight: 1.4, maxHeight: '3.6em', overflow: 'hidden' }}>
             {project.desc}
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {project.tech.slice(0, 3).map((t: string) => (
-              <span key={t} style={{ fontSize: '9px', padding: '2px 6px', background: '#e8f5e9', borderRadius: '4px', color: '#2e7d32', fontFamily: 'monospace', border: '1px solid #c8e6c9' }}>
+              <span key={t} style={{ fontSize: '10px', padding: '2px 7px', background: '#e8f5e9', borderRadius: '4px', color: '#2e7d32', fontFamily: 'monospace', border: '1px solid #c8e6c9' }}>
                 {t}
               </span>
             ))}
             {project.tech.length > 3 && (
-              <span style={{ fontSize: '9px', padding: '2px 6px', color: '#999', fontFamily: 'monospace' }}>+{project.tech.length - 3}</span>
+              <span style={{ fontSize: '10px', padding: '2px 7px', color: '#999', fontFamily: 'monospace' }}>+{project.tech.length - 3}</span>
             )}
           </div>
         </div>
@@ -2274,7 +2274,7 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   const smoothRotation = useSpring(rotation, { stiffness: 120, damping: 20 })
   const [progress, setProgress] = useState(0)
 
-  const radius = 450
+  const radius = 650
   const cardAngle = 360 / projects.length
 
   // Wheel listener — must stop Lenis AND preventDefault when hovering
@@ -2326,15 +2326,15 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
 
   // Container fits ONLY the visible right half of the wheel + small buffer.
   // Wheel is centered at the container's left edge, so only the right
-  // semicircle is visible. This keeps the scroll-capture area small
-  // (only the wheel itself) so the rest of the page scrolls normally.
+  // semicircle is visible. This keeps the scroll-capture area precise
+  // (just the wheel itself) so the rest of the page scrolls normally.
   //
-  // containerH is intentionally < wheel diameter: cards rotate through
-  // the visible window like a slot machine. Only cards near angle 0°
-  // (right side) are fully visible; top/bottom cards are clipped and
-  // rotate into view as the user spins.
-  const containerW = radius + 40   // visible half + small buffer = ~490px
-  const containerH = 320           // compact window (was 600) — half the footprint
+  // containerH = 2 * radius so the FULL wheel is visible vertically
+  // (no top/bottom clipping). This expands the section vertically so
+  // the bigger wheel has room — but capture stays precise because the
+  // listener is only on this container, not the surrounding section.
+  const containerW = radius + 60   // visible right semicircle + buffer
+  const containerH = radius * 2    // full vertical diameter (no clipping)
 
   return (
     <div
@@ -2411,9 +2411,13 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
 
       {/* Hover hint */}
       <div style={{
-        position: 'absolute', bottom: '20px', right: '40px',
+        position: 'absolute', top: '20px', right: '20px',
         fontSize: '12px', color: '#888', fontFamily: 'monospace',
         zIndex: 10,
+        background: 'rgba(255,255,255,0.7)',
+        padding: '4px 10px',
+        borderRadius: '6px',
+        backdropFilter: 'blur(4px)',
       }}>
         ↑↓ Hover & scroll to spin · {progress} / {projects.length}
       </div>
@@ -2910,8 +2914,11 @@ export default function Home() {
             </h2>
             <p className="text-gray-600 text-lg">{PROJECTS.length}+ projects built — growing like a forest</p>
           </motion.div>
+        </div>
 
-          {/* Project Wheel — hover & scroll to spin */}
+        {/* Project Wheel — placed OUTSIDE the centered column so it can
+            truly pop out from the page's left edge. Hover & scroll to spin. */}
+        <div className="relative z-10">
           <ProjectWheel projects={PROJECTS} sound={sound} onCardClick={handleProjectClick} />
         </div>
       </section>
