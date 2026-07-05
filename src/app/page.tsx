@@ -2041,7 +2041,7 @@ export default function Home() {
       <ProjectsTransition />
 
       {/* ============ PROJECTS SECTION ============ */}
-      <section id="projects" className="relative z-10 py-24 px-6" style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 10%, #2a2a4e 20%, #4a4a6e 30%, #8a8aae 45%, #c0c0d8 55%, #ffffff 70%)' }}>
+      <section id="projects" className="relative z-10 py-24 px-6" style={{ background: '#ffffff' }}>
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
