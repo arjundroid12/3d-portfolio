@@ -2204,15 +2204,6 @@ function AIChatWidget({ sound }: { sound: any }) {
 // Outside the wheel, normal page scroll works.
 // Uses native wheel listener with passive:false to preventDefault.
 
-// Category color map — each category gets a signature accent
-const CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string; tagBg: string; tagText: string; tagBorder: string }> = {
-  'Frontend':   { bg: '#ecfdf5', border: 'rgba(16, 185, 129, 0.4)',  text: '#065f46', tagBg: '#d1fae5', tagText: '#047857', tagBorder: '#a7f3d0' },
-  'AI/ML':      { bg: '#f5f3ff', border: 'rgba(139, 92, 246, 0.4)',  text: '#5b21b6', tagBg: '#ede9fe', tagText: '#6d28d9', tagBorder: '#ddd6fe' },
-  'Backend':    { bg: '#eff6ff', border: 'rgba(59, 130, 246, 0.4)',  text: '#1e40af', tagBg: '#dbeafe', tagText: '#1d4ed8', tagBorder: '#bfdbfe' },
-  'Full-stack': { bg: '#fffbeb', border: 'rgba(245, 158, 11, 0.4)',  text: '#92400e', tagBg: '#fef3c7', tagText: '#b45309', tagBorder: '#fde68a' },
-}
-const getCategoryColor = (cat: string) => CATEGORY_COLORS[cat] ?? CATEGORY_COLORS['Frontend']
-
 function WheelCard({ project, angle, radius, rotation, sound, onClick }: {
   project: any; angle: number; radius: number; rotation: any; sound: any; onClick: () => void
 }) {
@@ -2240,35 +2231,35 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick }: {
       >
         <div
           style={{
-            width: '220px',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(76, 175, 80, 0.25)',
-            borderRadius: '14px',
-            padding: '14px',
-            boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
+            width: '440px',
+            background: 'rgba(255, 255, 255, 0.97)',
+            backdropFilter: 'blur(14px)',
+            border: '1px solid rgba(76, 175, 80, 0.35)',
+            borderRadius: '18px',
+            padding: '22px 24px',
+            boxShadow: '0 10px 32px rgba(0, 0, 0, 0.12)',
             cursor: 'pointer',
             transition: 'box-shadow 0.3s ease',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '28px' }}>{project.icon}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
+            <span style={{ fontSize: '52px' }}>{project.icon}</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>{project.name}</h3>
-              <span style={{ fontSize: '9px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{project.category}</span>
+              <h3 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#1a1a2e', fontFamily: '"Array", sans-serif', lineHeight: 1.1 }}>{project.name}</h3>
+              <span style={{ fontSize: '13px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.7px' }}>{project.category}</span>
             </div>
           </div>
-          <p style={{ margin: '0 0 8px 0', fontSize: '11px', color: '#555', lineHeight: 1.4, maxHeight: '2.8em', overflow: 'hidden' }}>
+          <p style={{ margin: '0 0 14px 0', fontSize: '15px', color: '#555', lineHeight: 1.5, maxHeight: '4.5em', overflow: 'hidden' }}>
             {project.desc}
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {project.tech.slice(0, 3).map((t: string) => (
-              <span key={t} style={{ fontSize: '9px', padding: '2px 6px', background: '#e8f5e9', borderRadius: '4px', color: '#2e7d32', fontFamily: 'monospace', border: '1px solid #c8e6c9' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {project.tech.slice(0, 5).map((t: string) => (
+              <span key={t} style={{ fontSize: '12px', padding: '4px 10px', background: '#e8f5e9', borderRadius: '6px', color: '#2e7d32', fontFamily: 'monospace', border: '1px solid #c8e6c9' }}>
                 {t}
               </span>
             ))}
-            {project.tech.length > 3 && (
-              <span style={{ fontSize: '9px', padding: '2px 6px', color: '#999', fontFamily: 'monospace' }}>+{project.tech.length - 3}</span>
+            {project.tech.length > 5 && (
+              <span style={{ fontSize: '12px', padding: '4px 10px', color: '#999', fontFamily: 'monospace' }}>+{project.tech.length - 5}</span>
             )}
           </div>
         </div>
@@ -2283,7 +2274,7 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   const smoothRotation = useSpring(rotation, { stiffness: 120, damping: 20 })
   const [progress, setProgress] = useState(0)
 
-  const radius = 450
+  const radius = 380
   const cardAngle = 360 / projects.length
 
   // Wheel listener — must stop Lenis AND preventDefault when hovering
@@ -2333,15 +2324,26 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
     })
   }, [smoothRotation, cardAngle, projects.length])
 
+  // Container sized so cards are never clipped on right/top/bottom.
+  // Left-side overlap (cards extending past the wheel center) is fine —
+  // the white fade mask hides the back-half cards gracefully, and the
+  // user explicitly allowed overlap.
+  const cardHalfW = 220  // half of card width (440)
+  const cardHalfH = 140  // half of card height (~280)
+  const containerW = radius + cardHalfW + 30   // = 630px
+  const containerH = (radius + cardHalfH) * 2  // = 1040px
+
   return (
     <div
       ref={wheelRef}
       style={{
         position: 'relative',
-        width: '100%',
-        height: '600px',
+        width: `${containerW}px`,
+        height: `${containerH}px`,
         overflow: 'hidden',
         cursor: 'grab',
+        marginLeft: 0,
+        marginRight: 'auto',
       }}
     >
       {/* Wheel container — center at left edge, right half visible */}
@@ -2397,18 +2399,22 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
         ))}
       </motion.div>
 
-      {/* Mask — fade cards on left (off-screen) side */}
+      {/* Mask — fade cards on left (off-screen) side only */}
       <div style={{
         position: 'absolute', inset: '0',
-        background: 'linear-gradient(90deg, rgba(240,247,240,1) 0%, rgba(240,247,240,0) 20%, rgba(240,247,240,0) 80%, rgba(240,247,240,0.6) 100%)',
+        background: 'linear-gradient(90deg, rgba(240,247,240,1) 0%, rgba(240,247,240,0.85) 8%, rgba(240,247,240,0) 28%, rgba(240,247,240,0) 100%)',
         pointerEvents: 'none', zIndex: 1,
       }} />
 
       {/* Hover hint */}
       <div style={{
-        position: 'absolute', bottom: '20px', right: '40px',
+        position: 'absolute', top: '20px', right: '20px',
         fontSize: '12px', color: '#888', fontFamily: 'monospace',
         zIndex: 10,
+        background: 'rgba(255,255,255,0.7)',
+        padding: '4px 10px',
+        borderRadius: '6px',
+        backdropFilter: 'blur(4px)',
       }}>
         ↑↓ Hover & scroll to spin · {progress} / {projects.length}
       </div>
