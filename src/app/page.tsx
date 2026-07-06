@@ -2371,14 +2371,13 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   }, [smoothRotation, cardAngle, projects.length])
 
   // BIG cards on a SMALL wheel. Cards overlap heavily (user said OK).
-  // Container must fit the cards' bounding box, NOT the wheel.
-  // Card is 420px wide × ~220px tall. radius=220.
-  // Top/bottom cards: center is at ±radius from wheel center,
-  //   card edge is at ±(radius + cardHalfH) → that's what container must fit.
-  // Right card: extends to radius + cardHalfW from wheel center.
+  // Wheel center is at x = cardHalfW from container left (so we see ~3/4 of wheel).
+  // Container must fit: wheel center (cardHalfW) + radius + cardHalfW (right card edge)
+  //   = cardHalfW + radius + cardHalfW = 2*cardHalfW + radius
+  // Height must fit top/bottom cards: (radius + cardHalfH) * 2
   const cardHalfW = 210  // half of card width (420)
   const cardHalfH = 110  // half of card height (~220)
-  const containerW = radius + cardHalfW + 20   // = 450px
+  const containerW = 2 * cardHalfW + radius + 20   // = 660px (fits full wheel + cards)
   const containerH = (radius + cardHalfH) * 2 + 40  // = 700px (fits in viewport)
 
   return (
@@ -2459,7 +2458,9 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
         marginRight: 'auto',
       }}
     >
-      {/* Wheel container — center at left edge, right half visible */}
+      {/* Wheel — shifted right so we see most of it (only left sliver hidden).
+          Wheel center at x = cardHalfW (210px) from container left.
+          This shows ~3/4 of the wheel, with cards on left/top/right/bottom visible. */}
       <motion.div
         style={{
           position: 'absolute',
@@ -2467,7 +2468,7 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
           left: '0px',
           width: `${radius * 2}px`,
           height: `${radius * 2}px`,
-          marginLeft: `-${radius}px`,
+          marginLeft: `-${radius - cardHalfW}px`,
           marginTop: `-${radius}px`,
           rotate: smoothRotation,
           background: 'rgba(76, 175, 80, 0.05)',
