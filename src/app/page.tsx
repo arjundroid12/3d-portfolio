@@ -2213,72 +2213,67 @@ const CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string
 }
 const getCategoryColor = (cat: string) => CATEGORY_COLORS[cat] ?? CATEGORY_COLORS['Frontend']
 
-function WheelCard({ project, angle, radius, rotation, sound, onClick, active }: {
-  project: any; angle: number; radius: number; rotation: any; sound: any; onClick: () => void; active: boolean
+function WheelCard({ project, angle, radius, rotation, sound, onClick }: {
+  project: any; angle: number; radius: number; rotation: any; sound: any; onClick: () => void
 }) {
   const counterRotation = useTransform(rotation, (r: number) => -r)
   const rad = (angle * Math.PI) / 180
   const x = Math.cos(rad) * radius
   const y = Math.sin(rad) * radius
-  const c = getCategoryColor(project.category)
 
   return (
-    <motion.div
-      animate={{ opacity: active ? 1 : 0.12, scale: active ? 1 : 0.92 }}
-      transition={{ duration: 0.35 }}
+    <div
       style={{
         position: 'absolute',
         top: `calc(50% + ${y}px)`,
         left: `calc(50% + ${x}px)`,
         transform: 'translate(-50%, -50%)',
-        zIndex: active ? 5 : 2,
-        pointerEvents: active ? 'auto' : 'none',
+        zIndex: 5,
       }}
     >
       <motion.div
         style={{ rotate: counterRotation }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.97 }}
-        onMouseEnter={() => { if (active) sound.playHover() }}
+        onMouseEnter={() => sound.playHover()}
         onClick={onClick}
       >
         <div
           style={{
-            width: '440px',
-            background: `linear-gradient(180deg, ${c.bg} 0%, rgba(255, 255, 255, 0.97) 30%)`,
-            backdropFilter: 'blur(14px)',
-            border: `1px solid ${c.border}`,
-            borderTop: `4px solid ${c.border}`,
-            borderRadius: '18px',
-            padding: '22px 24px',
-            boxShadow: '0 10px 32px rgba(0, 0, 0, 0.12)',
+            width: '220px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(76, 175, 80, 0.25)',
+            borderRadius: '14px',
+            padding: '14px',
+            boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
             cursor: 'pointer',
             transition: 'box-shadow 0.3s ease',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
-            <span style={{ fontSize: '52px' }}>{project.icon}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '28px' }}>{project.icon}</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#1a1a2e', fontFamily: '"Array", sans-serif', lineHeight: 1.1 }}>{project.name}</h3>
-              <span style={{ fontSize: '13px', color: c.text, textTransform: 'uppercase', letterSpacing: '0.7px', fontWeight: 600 }}>{project.category}</span>
+              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>{project.name}</h3>
+              <span style={{ fontSize: '9px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{project.category}</span>
             </div>
           </div>
-          <p style={{ margin: '0 0 14px 0', fontSize: '15px', color: '#555', lineHeight: 1.5, maxHeight: '4.5em', overflow: 'hidden' }}>
+          <p style={{ margin: '0 0 8px 0', fontSize: '11px', color: '#555', lineHeight: 1.4, maxHeight: '2.8em', overflow: 'hidden' }}>
             {project.desc}
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {project.tech.slice(0, 5).map((t: string) => (
-              <span key={t} style={{ fontSize: '12px', padding: '4px 10px', background: c.tagBg, borderRadius: '6px', color: c.tagText, fontFamily: 'monospace', border: `1px solid ${c.tagBorder}` }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {project.tech.slice(0, 3).map((t: string) => (
+              <span key={t} style={{ fontSize: '9px', padding: '2px 6px', background: '#e8f5e9', borderRadius: '4px', color: '#2e7d32', fontFamily: 'monospace', border: '1px solid #c8e6c9' }}>
                 {t}
               </span>
             ))}
-            {project.tech.length > 5 && (
-              <span style={{ fontSize: '12px', padding: '4px 10px', color: '#999', fontFamily: 'monospace' }}>+{project.tech.length - 5}</span>
+            {project.tech.length > 3 && (
+              <span style={{ fontSize: '9px', padding: '2px 6px', color: '#999', fontFamily: 'monospace' }}>+{project.tech.length - 3}</span>
             )}
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -2287,41 +2282,9 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   const rotation = useMotionValue(0)
   const smoothRotation = useSpring(rotation, { stiffness: 120, damping: 20 })
   const [progress, setProgress] = useState(0)
-  const [activeCategory, setActiveCategory] = useState<string>('All')
 
-  const radius = 380
+  const radius = 450
   const cardAngle = 360 / projects.length
-
-  // Unique categories in project order (preserve wheel order)
-  const categories = ['All', ...Array.from(new Set(projects.map(p => p.category)))]
-  const categoryCount = (cat: string) =>
-    cat === 'All' ? projects.length : projects.filter(p => p.category === cat).length
-
-  // When user picks a category, smoothly spin the wheel to bring the FIRST
-  // matching card to the right side (angle 0°). cardAngle = 360 / N.
-  // Card i's base angle is i*cardAngle - 90 (so i=0 is at top = -90°).
-  // We want that card's screen angle (after rotation) to be 0° (right side).
-  //   screenAngle = (baseAngle + rotation) mod 360
-  //   0 = (i*cardAngle - 90 + rotation) mod 360
-  //   rotation = 90 - i*cardAngle (then add multiples of 360 to stay near current)
-  const spinToCategory = (cat: string) => {
-    if (cat === 'All') return
-    const idx = projects.findIndex(p => p.category === cat)
-    if (idx === -1) return
-    const targetRot = 90 - idx * cardAngle
-    // Find nearest equivalent angle to current rotation (avoid huge spins)
-    const current = rotation.get()
-    let delta = targetRot - (current % 360)
-    if (delta > 180) delta -= 360
-    if (delta < -180) delta += 360
-    rotation.set(current + delta)
-  }
-
-  const handleChipClick = (cat: string) => {
-    sound.playClick()
-    setActiveCategory(cat)
-    spinToCategory(cat)
-  }
 
   // Wheel listener — must stop Lenis AND preventDefault when hovering
   // Lenis intercepts wheel events at window level, so we need to:
@@ -2370,91 +2333,15 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
     })
   }, [smoothRotation, cardAngle, projects.length])
 
-  // Container sized so cards are never clipped on right/top/bottom.
-  // Left-side overlap (cards extending past the wheel center) is fine —
-  // the white fade mask hides the back-half cards gracefully, and the
-  // user explicitly allowed overlap.
-  const cardHalfW = 220  // half of card width (440)
-  const cardHalfH = 140  // half of card height (~280)
-  const containerW = radius + cardHalfW + 30   // = 630px
-  const containerH = (radius + cardHalfH) * 2  // = 1040px
-
   return (
-    <div style={{ position: 'relative', width: '100%' }}>
-      {/* Filter chips row — LEFT-aligned so chips sit directly above the
-          wheel (which pops out from the left edge). Width matches wheel
-          container so the chip row aligns with the wheel's visible area. */}
-      <div style={{
-        display: 'flex', flexWrap: 'wrap', gap: '10px',
-        justifyContent: 'flex-start', alignItems: 'center',
-        padding: '0 0 24px 0',
-        width: `${containerW}px`,
-        marginLeft: 0,
-        marginRight: 'auto',
-      }}>
-        {categories.map(cat => {
-          const isActive = activeCategory === cat
-          const c = cat === 'All' ? null : getCategoryColor(cat)
-          return (
-            <button
-              key={cat}
-              onClick={() => handleChipClick(cat)}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '9px 18px',
-                borderRadius: '999px',
-                fontFamily: 'monospace',
-                fontSize: '13px',
-                fontWeight: 600,
-                letterSpacing: '0.4px',
-                cursor: 'pointer',
-                border: isActive
-                  ? (c ? `1.5px solid ${c.border}` : '1.5px solid rgba(76, 175, 80, 0.6)')
-                  : '1.5px solid rgba(0, 0, 0, 0.12)',
-                background: isActive
-                  ? (c ? c.bg : '#e8f5e9')
-                  : 'rgba(255, 255, 255, 0.7)',
-                color: isActive
-                  ? (c ? c.text : '#1b5e20')
-                  : '#555',
-                boxShadow: isActive
-                  ? (c ? `0 4px 14px ${c.border}` : '0 4px 14px rgba(76, 175, 80, 0.25)')
-                  : '0 1px 4px rgba(0, 0, 0, 0.04)',
-                transition: 'all 0.25s ease',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              {/* Color dot — only for non-All chips */}
-              {c && (
-                <span style={{
-                  width: '9px', height: '9px', borderRadius: '50%',
-                  background: c.border.replace('0.4', '1').replace('rgba', 'rgb'),
-                  boxShadow: `0 0 6px ${c.border}`,
-                }} />
-              )}
-              {cat}
-              <span style={{
-                fontSize: '11px', opacity: 0.7,
-                background: isActive ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.05)',
-                padding: '1px 7px', borderRadius: '999px',
-              }}>
-                {categoryCount(cat)}
-              </span>
-            </button>
-          )
-        })}
-      </div>
-
     <div
       ref={wheelRef}
       style={{
         position: 'relative',
-        width: `${containerW}px`,
-        height: `${containerH}px`,
+        width: '100%',
+        height: '600px',
         overflow: 'hidden',
         cursor: 'grab',
-        marginLeft: 0,
-        marginRight: 'auto',
       }}
     >
       {/* Wheel container — center at left edge, right half visible */}
@@ -2506,31 +2393,25 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
             rotation={smoothRotation}
             sound={sound}
             onClick={() => { sound.playClick(); onCardClick(project) }}
-            active={activeCategory === 'All' || project.category === activeCategory}
           />
         ))}
       </motion.div>
 
-      {/* Mask — fade cards on left (off-screen) side only */}
+      {/* Mask — fade cards on left (off-screen) side */}
       <div style={{
         position: 'absolute', inset: '0',
-        background: 'linear-gradient(90deg, rgba(240,247,240,1) 0%, rgba(240,247,240,0.85) 8%, rgba(240,247,240,0) 28%, rgba(240,247,240,0) 100%)',
+        background: 'linear-gradient(90deg, rgba(240,247,240,1) 0%, rgba(240,247,240,0) 20%, rgba(240,247,240,0) 80%, rgba(240,247,240,0.6) 100%)',
         pointerEvents: 'none', zIndex: 1,
       }} />
 
       {/* Hover hint */}
       <div style={{
-        position: 'absolute', top: '20px', right: '20px',
+        position: 'absolute', bottom: '20px', right: '40px',
         fontSize: '12px', color: '#888', fontFamily: 'monospace',
         zIndex: 10,
-        background: 'rgba(255,255,255,0.7)',
-        padding: '4px 10px',
-        borderRadius: '6px',
-        backdropFilter: 'blur(4px)',
       }}>
         ↑↓ Hover & scroll to spin · {progress} / {projects.length}
       </div>
-    </div>
     </div>
   )
 }
