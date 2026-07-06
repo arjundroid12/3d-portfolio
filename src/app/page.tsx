@@ -2377,7 +2377,7 @@ function ProjectWheel({ projects, sound, onCardClick }: { projects: any[]; sound
   const cardHalfW = 220  // half of card width (440)
   const cardHalfH = 140  // half of card height (~280)
   const containerW = radius + cardHalfW + 30   // = 630px
-  const containerH = (radius + cardHalfH) * 2  // = 1040px
+  const containerH = (radius + cardHalfH) * 2 + 60  // = 1100px (buffer prevents clipping)
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
