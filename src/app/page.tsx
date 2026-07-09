@@ -1980,18 +1980,20 @@ function KingCharacter({ sounds, onKingClick, onKingAttack, triggerShake, onChes
         }}
       />
 
-      {/* King's treasure chest — click to open and get loot! */}
+      {/* King's treasure chest — tucked behind the right urn/shelf, near the floor.
+          Clickable to open and get loot! Positioned low and to the right so it
+          looks like it's sitting on the floor behind the furniture. */}
       <div
         onClick={handleChestClick}
         style={{
           position: 'absolute',
-          bottom: '20%',
-          right: '18%',
-          width: '90px',
-          height: '90px',
+          bottom: '18%',
+          right: '8%',
+          width: '70px',
+          height: '70px',
           cursor: chestOpen ? 'default' : 'pointer',
           pointerEvents: 'auto',
-          zIndex: 3,
+          zIndex: 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -3521,6 +3523,80 @@ function DungeonScene({ wallColor = 'grey' }: { wallColor?: 'purple' | 'grey' | 
   )
 }
 
+// ============ DUNGEON ANIMALS ============
+// Animated pixel-art animals placed across the dungeon sections.
+// Each animal is positioned absolutely within its parent section
+// (DungeonScene wraps everything in position:absolute inset:0).
+// They float/wander subtly and add life to the dungeon.
+
+function DungeonAnimals({ variant = 'projects' }: { variant?: 'projects' | 'about' | 'contact' }) {
+  // Different animals in different sections for variety
+  const animalSets = {
+    projects: [
+      { src: '/animals/golden-bark.gif', bottom: '5%', left: '12%', width: '70px', label: 'Guard dog' },
+      { src: '/animals/cat-jump.gif', bottom: '8%', right: '20%', width: '50px', label: 'Dungeon cat' },
+      { src: '/animals/bird.gif', top: '15%', left: '25%', width: '32px', label: 'Cave bird' },
+      { src: '/animals/frog.gif', bottom: '3%', right: '40%', width: '45px', label: 'Slime frog' },
+    ],
+    about: [
+      { src: '/animals/dog-sleep.gif', bottom: '6%', left: '15%', width: '80px', label: 'Sleeping guard' },
+      { src: '/animals/pig.gif', bottom: '5%', right: '15%', width: '70px', label: 'Dungeon pig' },
+      { src: '/animals/bird.gif', top: '12%', right: '30%', width: '28px', label: 'Cave bird' },
+    ],
+    contact: [
+      { src: '/animals/dog-jump.gif', bottom: '7%', left: '18%', width: '55px', label: 'Excited dog' },
+      { src: '/animals/frog.gif', bottom: '4%', right: '25%', width: '40px', label: 'Slime frog' },
+      { src: '/animals/goldie.gif', bottom: '5%', right: '10%', width: '65px', label: 'Goldie' },
+    ],
+  }
+
+  const animals = animalSets[variant]
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 11, pointerEvents: 'none', overflow: 'hidden' }}>
+      {animals.map((animal, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.3, duration: 0.8 }}
+          style={{
+            position: 'absolute',
+            ...('left' in animal ? { left: animal.left } : {}),
+            ...('right' in animal ? { right: animal.right } : {}),
+            ...('top' in animal ? { top: animal.top } : {}),
+            bottom: animal.bottom,
+            width: animal.width,
+            height: 'auto',
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))',
+          }}
+          title={animal.label}
+        >
+          {/* Subtle floating animation */}
+          <motion.img
+            src={animal.src}
+            alt={animal.label}
+            animate={{ y: [0, -6, 0] }}
+            transition={{
+              duration: 3 + i * 0.5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: i * 0.4,
+            }}
+            style={{
+              width: '100%',
+              height: 'auto',
+              imageRendering: 'pixelated',
+            }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
 // ============ ACHIEVEMENT SYSTEM ============
 
 const ACHIEVEMENTS = [
@@ -4406,6 +4482,7 @@ export default function Home() {
       <section id="projects" className="relative z-10 py-24 overflow-hidden" style={{ background: '#1a1010' }}>
         {/* Dungeon scene — purple walls */}
         <DungeonScene wallColor="purple" />
+        <DungeonAnimals variant="projects" />
 
         <div className="relative z-10">
           <motion.div
@@ -4483,6 +4560,7 @@ export default function Home() {
       <section id="about" className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: '#1a1010' }}>
         {/* Dungeon scene — grey walls */}
         <DungeonScene wallColor="grey" />
+        <DungeonAnimals variant="about" />
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -4556,6 +4634,7 @@ export default function Home() {
       <section id="contact" className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: '#1a1010' }}>
         {/* Dungeon scene — blue walls */}
         <DungeonScene wallColor="blue" />
+        <DungeonAnimals variant="contact" />
         <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
