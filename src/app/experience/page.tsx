@@ -246,17 +246,19 @@ export default function ExperiencePage() {
           </p>
         </div>
 
-        {/* Wizard character — clickable, speech bubble on click */}
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {/* Speech bubble — to the LEFT of the wizard, vertically centered.
-              Wizard GIF has been cropped to its actual sprite (no padding),
-              so a clean 14px gap looks right. Tail points right toward wizard. */}
+        {/* Wizard character — clickable, speech bubble on click.
+            alignItems: flex-end keeps the wizard + label flush-right within
+            the grid cell so the wizard aligns with the section's right edge. */}
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Speech bubble — to the LEFT of the wizard, anchored at ~35% from top
+              so the tail points toward the wizard's face/upper body (a portrait
+              sprite's head sits in the upper third, not dead center). */}
           {showWizardBubble && (
             <div
               style={{
                 position: 'absolute',
                 right: 'calc(100% + 14px)',
-                top: '50%',
+                top: '35%',
                 transform: 'translateY(-50%)',
                 maxWidth: '300px',
                 width: 'max-content',
@@ -275,7 +277,8 @@ export default function ExperiencePage() {
               }}
             >
               {wizardLine}
-              {/* tail — on the RIGHT side of bubble, pointing toward the wizard */}
+              {/* tail — on the RIGHT side of bubble, aligned with the bubble's
+                  vertical anchor (35% from top), pointing toward the wizard */}
               <div
                 style={{
                   position: 'absolute',
@@ -335,6 +338,7 @@ export default function ExperiencePage() {
               textTransform: 'uppercase',
               color: 'rgba(168,85,247,0.7)',
               fontFamily: 'var(--font-vt323), monospace',
+              textAlign: 'right',
             }}
           >
             click to talk
