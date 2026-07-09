@@ -241,3 +241,42 @@ Stage Summary:
 - Techify Inc. reference corrected to AIOrders x Foodswipe
 - Live at https://arjun-portfolio-emc.pages.dev (scroll to About)
 - Both repos synced at 888eb26
+
+---
+Task ID: 7
+Agent: main (Super Z)
+Task: Pause portfolio work. Build new SDN project (Software-defined Networking) as a new GitHub repo.
+
+Work Log:
+- AskUserQuestion: clarified scope = custom Ryu controller + P4 data plane + Mininet,
+  features = topology view + CLI + web dashboard + REST API + tests/CI,
+  deliverable = code + README, deadline = course-grade, new GitHub repo, link to portfolio later
+- Created /home/z/my-project/sdn-project/ with full structure (12 directories)
+- Wrote p4/basic_forwarding.p4 — P4-16 program for BMv2 with L2 forward, ACL, L3 route tables
+- Wrote controller/ Ryu app (5 modules):
+  * topology.py — TopologyManager singleton, thread-safe, Switch/Host/Link dataclasses
+  * forwarding.py — reactive L2 forwarding, BFS shortest path, bidirectional flow install
+  * rest_api.py — Flask REST API (10 endpoints: topology/switches/hosts/links/flows/stats/health/version)
+  * dashboard.py — Flask blueprint serving the web SPA at /
+  * main.py — Ryu app entry with deferred imports (works without Ryu installed)
+- Wrote mininet/topology.py — 4-switch ring+chord topology, CLI args, runs with sudo
+- Wrote cli/sdnctl.py — full CLI: topology/switches/switch/hosts/links/flows/install-flow/delete-flow/stats/health/version
+- Wrote web/ dashboard: index.html + dashboard.css + app.js (D3.js force-directed graph, polls every 2s)
+- Wrote tests/ — 46 tests covering topology, forwarding, REST API, CLI
+- Fixed bugs during testing:
+  * dataclass field ordering (non-default fields must come before default)
+  * deferred Ryu imports in forwarding.py (was failing at module load)
+  * escaped backslash in test docstring (SyntaxWarning)
+  * monkeypatch forwarding.topology in path tests (was using global singleton)
+- All 46 tests passing in 0.49s
+- Wrote .github/workflows/ci.yml — matrix on Python 3.9/3.10/3.11 + lint job
+- Wrote requirements.txt (ryu + flask) + requirements-dev.txt (pytest + cov)
+- Wrote comprehensive README.md (architecture diagram, quickstart, all components, API table, CLI usage, testing, CI, roadmap)
+- Created GitHub repo arjundroid12/sdn-project via API (public)
+- Committed (228b3d9) and pushed to origin/main
+
+Stage Summary:
+- New repo live at https://github.com/arjundroid12/sdn-project
+- 26 files, 46 passing tests, CI configured for py3.9-3.11
+- Ready for next session: P4Runtime integration, DDoS detection, or load balancer mode
+- Portfolio untouched (per user instruction to pause)
