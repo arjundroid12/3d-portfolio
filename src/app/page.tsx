@@ -4120,6 +4120,28 @@ export default function Home() {
 
           {/* Content */}
           <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', flexWrap: 'nowrap', width: '100%', gap: '10px' }}>
+            {/* Sleeping dog — INSIDE the nav bar, sits right on the glass surface */}
+            {!isMobile && (
+              <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0, imageRendering: 'pixelated' }}>
+                <motion.img
+                  src="/animals/dog-sleep.gif"
+                  alt="Sleeping guard dog"
+                  animate={{ y: [0, -2, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ width: '100%', height: '100%', imageRendering: 'pixelated', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
+                />
+                <motion.span
+                  animate={{ y: [0, -6, -12], opacity: [0, 1, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+                  style={{ position: 'absolute', top: '-2px', right: '-4px', fontSize: '12px', fontFamily: 'var(--font-vt323), "VT323", monospace', color: '#fde047', textShadow: '1px 1px 0 #000', pointerEvents: 'none' }}
+                >z</motion.span>
+                <motion.span
+                  animate={{ y: [0, -8, -16], opacity: [0, 1, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: 1 }}
+                  style={{ position: 'absolute', top: '-4px', right: '-8px', fontSize: '15px', fontFamily: 'var(--font-vt323), "VT323", monospace', color: '#fde047', textShadow: '1px 1px 0 #000', pointerEvents: 'none' }}
+                >Z</motion.span>
+              </div>
+            )}
             {/* Logo */}
             <a href="#hero" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, fontWeight: 600, fontSize: '17px', letterSpacing: '-0.5px', textDecoration: 'none', color: navOnWhite ? '#6d28d9' : '#b9a3ff', textShadow: navOnWhite ? 'none' : '0 0 18px rgba(185,163,255,0.55)', transition: 'color 0.4s ease' }}>
               &lt;arjun/&gt;
@@ -4240,98 +4262,7 @@ export default function Home() {
         </div>
       </motion.nav>
 
-      {/* ============ NAV BAR PET DOG ============ */}
-      {/* A sleeping dog perched ON the nav bar glass surface, to the LEFT of
-          the <arjun/> logo. Desktop only. */}
-      {!isMobile && (
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, type: 'spring', stiffness: 80, damping: 12 }}
-          style={{
-            position: 'fixed',
-            // Nav bar: top 26px, left 22px, height 52px, borderRadius 28px
-            // Logo <arjun/> is at left ~44px inside nav. Dog sits BETWEEN the
-            // nav bar's left rounded edge and the logo — on the glass surface.
-            top: '28px',
-            left: '28px',
-            zIndex: 55,
-            width: '44px',
-            height: '44px',
-            pointerEvents: 'none',
-            imageRendering: 'pixelated',
-          }}
-        >
-          {/* Subtle breathing animation */}
-          <motion.img
-            src="/animals/dog-sleep.gif"
-            alt="Sleeping guard dog"
-            animate={{
-              y: [0, -2, 0],
-              rotate: [0, 1, 0],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            style={{
-              width: '100%',
-              height: '100%',
-              imageRendering: 'pixelated',
-              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 6px rgba(253, 224, 71, 0.15))',
-            }}
-          />
-          {/* "Zzz" sleep indicator floating above the dog */}
-          <motion.span
-            animate={{
-              y: [0, -8, -16],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeOut',
-            }}
-            style={{
-              position: 'absolute',
-              top: '-4px',
-              right: '0px',
-              fontSize: '14px',
-              fontFamily: 'var(--font-vt323), "VT323", monospace',
-              color: '#fde047',
-              textShadow: '1px 1px 0 #000',
-              pointerEvents: 'none',
-            }}
-          >
-            z
-          </motion.span>
-          <motion.span
-            animate={{
-              y: [0, -10, -20],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeOut',
-              delay: 1,
-            }}
-            style={{
-              position: 'absolute',
-              top: '-8px',
-              right: '-8px',
-              fontSize: '18px',
-              fontFamily: 'var(--font-vt323), "VT323", monospace',
-              color: '#fde047',
-              textShadow: '1px 1px 0 #000',
-              pointerEvents: 'none',
-            }}
-          >
-            Z
-          </motion.span>
-        </motion.div>
-      )}
+      {/* (Old floating nav dog removed — dog is now INSIDE the nav bar above) */}
 
       {/* Mobile dropdown menu — shows when hamburger clicked */}
       {isMobile && mobileMenuOpen && (
