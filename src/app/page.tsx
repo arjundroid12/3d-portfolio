@@ -4887,56 +4887,237 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* === LEFT: Intro card === */}
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold mb-6 text-amber-200">👋 Hey, I'm Arjun</h3>
-              <div className="space-y-4 text-amber-100/70 leading-relaxed">
-                <p>
-                  I'm a 4th-year B.Tech Computer Science & Engineering student at{' '}
-                  <span className="text-amber-400 font-semibold">VIT Bhopal University</span>,
-                  currently working in Software Management & Marketing at{' '}
-                  <span className="text-amber-400 font-semibold">Techify Inc.</span>
-                </p>
-                <p>
-                  My foundation is in <span className="text-amber-400 font-semibold">Python, machine learning, and data analytics</span>,
-                  with hands-on experience building AI/ML projects. Recently, I've been diving deep into{' '}
-                  <span className="text-amber-400 font-semibold">AI engineering</span> — building 4 production-ready AI agents.
-                </p>
-                <p>
-                  When I'm not coding, I'm creating UGC content, editing videos, and exploring music
-                  (I'm a vocalist and flutist).
-                </p>
+              <div
+                style={{
+                  position: 'relative',
+                  padding: '28px 28px 30px',
+                  borderRadius: '16px',
+                  height: '100%',
+                  background: 'linear-gradient(160deg, rgba(30,20,12,0.85) 0%, rgba(20,14,8,0.92) 100%)',
+                  border: '1px solid rgba(250,204,21,0.2)',
+                  boxShadow:
+                    'inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 40px rgba(0,0,0,0.4), 0 10px 32px rgba(0,0,0,0.5)',
+                  backdropFilter: 'blur(8px)',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Top accent line */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0, left: '15%', right: '15%',
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(250,204,21,0.6), transparent)',
+                  }}
+                />
+                <h3
+                  style={{
+                    fontFamily: '"TrenchSlab", sans-serif',
+                    fontSize: '22px',
+                    fontWeight: 700,
+                    marginBottom: '18px',
+                    color: '#fde68a',
+                    textShadow: '0 0 14px rgba(250,204,21,0.3)',
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center', justifyContent: 'center',
+                      width: '36px', height: '36px',
+                      borderRadius: '50%',
+                      background: 'radial-gradient(circle at 30% 30%, rgba(250,204,21,0.25), rgba(120,80,20,0.4))',
+                      border: '1px solid rgba(250,204,21,0.4)',
+                      boxShadow: '0 0 16px rgba(250,204,21,0.3)',
+                      fontSize: '18px',
+                    }}
+                  >👋</span>
+                  Hey, I&apos;m Arjun
+                </h3>
+                <div
+                  style={{
+                    color: 'rgba(253,230,138,0.78)',
+                    lineHeight: 1.7,
+                    fontSize: '15px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '14px',
+                  }}
+                >
+                  <p style={{ margin: 0 }}>
+                    I&apos;m a 4th-year B.Tech Computer Science &amp; Engineering student at{' '}
+                    <span style={{ color: '#fde68a', fontWeight: 600 }}>VIT Bhopal University</span>,
+                    currently leading Website Management &amp; Marketing at{' '}
+                    <span style={{ color: '#fde68a', fontWeight: 600 }}>AIOrders × Foodswipe</span>.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    My foundation is in{' '}
+                    <span style={{ color: '#fde68a', fontWeight: 600 }}>Python, machine learning, and data analytics</span>,
+                    with hands-on experience building AI/ML projects. Recently, I&apos;ve been diving deep into{' '}
+                    <span style={{ color: '#fde68a', fontWeight: 600 }}>AI engineering</span> — building 4 production-ready AI agents.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    When I&apos;m not coding, I&apos;m creating UGC content, editing videos, and exploring music
+                    (I&apos;m a vocalist and flutist).
+                  </p>
+                </div>
               </div>
             </motion.div>
 
+            {/* === RIGHT: Skills card === */}
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold mb-6 text-amber-200">🛠️ Skills</h3>
-              <div className="space-y-5">
-                {Object.entries(SKILLS).map(([category, skills]) => (
-                  <div key={category}>
-                    <div className="text-xs font-mono text-amber-400 mb-2 uppercase tracking-wider">{category}</div>
-                    <div className="flex flex-wrap gap-2">
-                      {skills.map((skill) => (
-                        <motion.span
-                          key={skill}
-                          whileHover={{ scale: 1.1, y: -2 }}
-                          onMouseEnter={() => sound.playPop()}
-                          className="px-3 py-1 text-sm bg-amber-900/30 border border-amber-700/40 rounded-lg font-mono text-amber-100 cursor-default"
+              <div
+                style={{
+                  position: 'relative',
+                  padding: '28px 28px 30px',
+                  borderRadius: '16px',
+                  height: '100%',
+                  background: 'linear-gradient(160deg, rgba(30,20,12,0.85) 0%, rgba(20,14,8,0.92) 100%)',
+                  border: '1px solid rgba(250,204,21,0.2)',
+                  boxShadow:
+                    'inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 40px rgba(0,0,0,0.4), 0 10px 32px rgba(0,0,0,0.5)',
+                  backdropFilter: 'blur(8px)',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Top accent line */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0, left: '15%', right: '15%',
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(250,204,21,0.6), transparent)',
+                  }}
+                />
+                <h3
+                  style={{
+                    fontFamily: '"TrenchSlab", sans-serif',
+                    fontSize: '22px',
+                    fontWeight: 700,
+                    marginBottom: '22px',
+                    color: '#fde68a',
+                    textShadow: '0 0 14px rgba(250,204,21,0.3)',
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center', justifyContent: 'center',
+                      width: '36px', height: '36px',
+                      borderRadius: '50%',
+                      background: 'radial-gradient(circle at 30% 30%, rgba(250,204,21,0.25), rgba(120,80,20,0.4))',
+                      border: '1px solid rgba(250,204,21,0.4)',
+                      boxShadow: '0 0 16px rgba(250,204,21,0.3)',
+                      fontSize: '18px',
+                    }}
+                  >🛠️</span>
+                  Skills
+                </h3>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '18px',
+                  }}
+                >
+                  {Object.entries(SKILLS).map(([category, skills]) => (
+                    <div key={category}>
+                      {/* Category header with accent dot + line */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '10px',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: '6px', height: '6px',
+                            borderRadius: '50%',
+                            background: '#fde68a',
+                            boxShadow: '0 0 8px rgba(250,204,21,0.6)',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontFamily: 'var(--font-vt323), monospace',
+                            color: 'rgba(250,204,21,0.75)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '2px',
+                            fontWeight: 600,
+                          }}
                         >
-                          {skill}
-                        </motion.span>
-                      ))}
+                          {category}
+                        </span>
+                        <span
+                          style={{
+                            flex: 1,
+                            height: '1px',
+                            background: 'linear-gradient(90deg, rgba(250,204,21,0.3), transparent)',
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '7px',
+                        }}
+                      >
+                        {skills.map((skill) => (
+                          <motion.span
+                            key={skill}
+                            whileHover={{ scale: 1.08, y: -2 }}
+                            onMouseEnter={() => sound.playPop()}
+                            style={{
+                              display: 'inline-block',
+                              padding: '5px 12px',
+                              fontSize: '12.5px',
+                              fontFamily: 'var(--font-vt323), monospace',
+                              letterSpacing: '0.3px',
+                              color: '#fde68a',
+                              background: 'rgba(250,204,21,0.06)',
+                              border: '1px solid rgba(250,204,21,0.25)',
+                              borderRadius: '999px',
+                              cursor: 'default',
+                              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+                              transition: 'background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.background = 'rgba(250,204,21,0.14)'
+                              e.currentTarget.style.borderColor = 'rgba(250,204,21,0.55)'
+                              e.currentTarget.style.boxShadow =
+                                '0 0 14px rgba(250,204,21,0.3), inset 0 1px 0 rgba(255,255,255,0.1)'
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.background = 'rgba(250,204,21,0.06)'
+                              e.currentTarget.style.borderColor = 'rgba(250,204,21,0.25)'
+                              e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.05)'
+                            }}
+                          >
+                            {skill}
+                          </motion.span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </motion.div>
           </div>
