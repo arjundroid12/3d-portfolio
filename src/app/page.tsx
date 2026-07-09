@@ -4238,60 +4238,56 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        {/* Sleeping dog perched on the TOP EDGE of the nav bar —
+            positioned absolutely relative to the nav so it always moves
+            with the nav regardless of viewport width. Desktop only. */}
+        {!isMobile && (
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, type: 'spring', stiffness: 80, damping: 12 }}
+            style={{
+              position: 'absolute',
+              // Sit on the top edge: bottom half on the nav, top half above it
+              // Nav bar height is 52px. Dog is 46px. Top = -18px puts dog's
+              // bottom 60% on the nav, top 40% above the edge.
+              top: '-18px',
+              left: '30px',
+              zIndex: 55,
+              width: '46px',
+              height: '46px',
+              pointerEvents: 'none',
+              imageRendering: 'pixelated',
+            }}
+          >
+            <motion.img
+              src="/animals/dog-sleep.gif"
+              alt="Sleeping guard dog"
+              animate={{ y: [0, -2, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                imageRendering: 'pixelated',
+                filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6))',
+              }}
+            />
+            <motion.span
+              animate={{ y: [0, -8, -16], opacity: [0, 1, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+              style={{ position: 'absolute', top: '-4px', right: '0px', fontSize: '14px', fontFamily: 'var(--font-vt323), "VT323", monospace', color: '#fde047', textShadow: '1px 1px 0 #000', pointerEvents: 'none' }}
+            >z</motion.span>
+            <motion.span
+              animate={{ y: [0, -10, -20], opacity: [0, 1, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: 1 }}
+              style={{ position: 'absolute', top: '-8px', right: '-8px', fontSize: '18px', fontFamily: 'var(--font-vt323), "VT323", monospace', color: '#fde047', textShadow: '1px 1px 0 #000', pointerEvents: 'none' }}
+            >Z</motion.span>
+          </motion.div>
+        )}
       </motion.nav>
 
-      {/* (Old floating nav dog removed — dog is now perched on the nav bar edge below) */}
-
-      {/* ============ DOG PERCHED ON NAV BAR EDGE ============ */}
-      {/* Sleeping dog sitting ON the top edge of the nav bar — like a cat on a ledge.
-          Bottom of dog aligns with top of nav bar (top:26px), so dog sits at
-          top: -20px relative to nav (26px - 46px height = -20px). Desktop only. */}
-      {!isMobile && (
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, type: 'spring', stiffness: 80, damping: 12 }}
-          style={{
-            position: 'fixed',
-            // Nav bar top edge is at 26px from viewport.
-            // Dog: 46px tall, sits so its bottom 60% rests ON the nav bar (below 26px)
-            // and top 40% pokes above the edge. Dog top = 26 - (46*0.4) = 26 - 18 = 8px
-            top: '8px',
-            left: '40px',
-            zIndex: 55,
-            width: '46px',
-            height: '46px',
-            pointerEvents: 'none',
-            imageRendering: 'pixelated',
-          }}
-        >
-          {/* Subtle breathing animation */}
-          <motion.img
-            src="/animals/dog-sleep.gif"
-            alt="Sleeping guard dog"
-            animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              width: '100%',
-              height: '100%',
-              imageRendering: 'pixelated',
-              filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6))',
-            }}
-          />
-          {/* "Zzz" sleep indicator floating above the dog */}
-          <motion.span
-            animate={{ y: [0, -8, -16], opacity: [0, 1, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
-            style={{ position: 'absolute', top: '-4px', right: '0px', fontSize: '14px', fontFamily: 'var(--font-vt323), "VT323", monospace', color: '#fde047', textShadow: '1px 1px 0 #000', pointerEvents: 'none' }}
-          >z</motion.span>
-          <motion.span
-            animate={{ y: [0, -10, -20], opacity: [0, 1, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: 1 }}
-            style={{ position: 'absolute', top: '-8px', right: '-8px', fontSize: '18px', fontFamily: 'var(--font-vt323), "VT323", monospace', color: '#fde047', textShadow: '1px 1px 0 #000', pointerEvents: 'none' }}
-          >Z</motion.span>
-        </motion.div>
-      )}
-
+      {/* (Old fixed-position dog code removed — dog is now a child of the nav bar above) */}
       {/* Mobile dropdown menu — shows when hamburger clicked */}
       {isMobile && mobileMenuOpen && (
         <motion.div
