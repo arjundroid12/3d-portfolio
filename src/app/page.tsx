@@ -4240,6 +4240,96 @@ export default function Home() {
         </div>
       </motion.nav>
 
+      {/* ============ NAV BAR PET DOG ============ */}
+      {/* A sleeping dog that sits on the left edge of the nav bar — like a
+          companion resting on the menu. Desktop only (mobile nav is too cramped). */}
+      {!isMobile && (
+        <motion.div
+          initial={{ opacity: 0, x: -30, y: -10 }}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          transition={{ delay: 1.2, type: 'spring', stiffness: 80, damping: 12 }}
+          style={{
+            position: 'fixed',
+            top: '18px',
+            left: 'calc((100vw - 1140px) / 2 - 70px)',
+            zIndex: 51,
+            width: '60px',
+            height: '60px',
+            pointerEvents: 'none',
+            imageRendering: 'pixelated',
+          }}
+        >
+          {/* Subtle breathing animation */}
+          <motion.img
+            src="/animals/dog-sleep.gif"
+            alt="Sleeping guard dog"
+            animate={{
+              y: [0, -2, 0],
+              rotate: [0, 1, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            style={{
+              width: '100%',
+              height: '100%',
+              imageRendering: 'pixelated',
+              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 6px rgba(253, 224, 71, 0.15))',
+            }}
+          />
+          {/* "Zzz" sleep indicator floating above the dog */}
+          <motion.span
+            animate={{
+              y: [0, -8, -16],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeOut',
+            }}
+            style={{
+              position: 'absolute',
+              top: '-4px',
+              right: '0px',
+              fontSize: '14px',
+              fontFamily: 'var(--font-vt323), "VT323", monospace',
+              color: '#fde047',
+              textShadow: '1px 1px 0 #000',
+              pointerEvents: 'none',
+            }}
+          >
+            z
+          </motion.span>
+          <motion.span
+            animate={{
+              y: [0, -10, -20],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeOut',
+              delay: 1,
+            }}
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '-8px',
+              fontSize: '18px',
+              fontFamily: 'var(--font-vt323), "VT323", monospace',
+              color: '#fde047',
+              textShadow: '1px 1px 0 #000',
+              pointerEvents: 'none',
+            }}
+          >
+            Z
+          </motion.span>
+        </motion.div>
+      )}
+
       {/* Mobile dropdown menu — shows when hamburger clicked */}
       {isMobile && mobileMenuOpen && (
         <motion.div
@@ -4307,6 +4397,88 @@ export default function Home() {
         style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
         className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-16 md:pt-32 md:pb-20"
       >
+        {/* Flying bird — circles around the hero section, flapping wings.
+            Uses a motion path animation to make it look like it's flying. */}
+        {!isMobile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 1 }}
+            style={{
+              position: 'absolute',
+              top: '15%',
+              left: '10%',
+              width: '48px',
+              height: '48px',
+              zIndex: 5,
+              pointerEvents: 'none',
+              imageRendering: 'pixelated',
+            }}
+          >
+            <motion.img
+              src="/animals/bird.gif"
+              alt="Flying bird"
+              animate={{
+                x: [0, 200, 400, 600, 400, 200, 0, -200, -100, 0],
+                y: [0, -80, -40, 20, 60, 30, -20, 40, -60, 0],
+                rotate: [0, 10, -5, 8, -3, 5, -8, 3, -5, 0],
+              }}
+              transition={{
+                duration: 18,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+              style={{
+                width: '100%',
+                height: '100%',
+                imageRendering: 'pixelated',
+                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4))',
+              }}
+            />
+          </motion.div>
+        )}
+
+        {/* Second bird — different flight path on the right side */}
+        {!isMobile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2, duration: 1 }}
+            style={{
+              position: 'absolute',
+              top: '25%',
+              right: '12%',
+              width: '36px',
+              height: '36px',
+              zIndex: 5,
+              pointerEvents: 'none',
+              imageRendering: 'pixelated',
+            }}
+          >
+            <motion.img
+              src="/animals/bird.gif"
+              alt="Flying bird"
+              animate={{
+                x: [0, -150, -300, -200, -50, 100, 250, 100, 0],
+                y: [0, 50, -30, -70, 20, 60, -20, -50, 0],
+                rotate: [0, -8, 5, -3, 8, -5, 3, -8, 0],
+                scaleX: [1, 1, -1, -1, 1, 1, -1, 1, 1],
+              }}
+              transition={{
+                duration: 22,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+              style={{
+                width: '100%',
+                height: '100%',
+                imageRendering: 'pixelated',
+                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4))',
+              }}
+            />
+          </motion.div>
+        )}
+
         <div className="text-center max-w-4xl">
           {/* Photo placeholder with animated ring */}
           <motion.div
