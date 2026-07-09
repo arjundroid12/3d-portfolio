@@ -4241,9 +4241,8 @@ export default function Home() {
       </motion.nav>
 
       {/* ============ NAV BAR PET DOG ============ */}
-      {/* A sleeping dog perched on the LEFT rounded edge of the nav bar —
-          like a companion pet sitting on the corner of the menu.
-          Desktop only (mobile nav is too cramped). */}
+      {/* A sleeping dog perched ON the nav bar glass surface, to the LEFT of
+          the <arjun/> logo. Desktop only. */}
       {!isMobile && (
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -4251,14 +4250,14 @@ export default function Home() {
           transition={{ delay: 1.2, type: 'spring', stiffness: 80, damping: 12 }}
           style={{
             position: 'fixed',
-            // Nav bar is at: top 26px, left 22px, height 52px, borderRadius 28px
-            // Dog sits ON the left rounded edge — centered vertically on the nav bar,
-            // positioned at the far left edge before the logo
-            top: '24px',
-            left: '8px',
+            // Nav bar: top 26px, left 22px, height 52px, borderRadius 28px
+            // Logo <arjun/> is at left ~44px inside nav. Dog sits BETWEEN the
+            // nav bar's left rounded edge and the logo — on the glass surface.
+            top: '28px',
+            left: '28px',
             zIndex: 55,
-            width: '48px',
-            height: '48px',
+            width: '44px',
+            height: '44px',
             pointerEvents: 'none',
             imageRendering: 'pixelated',
           }}
