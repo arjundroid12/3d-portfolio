@@ -4241,20 +4241,26 @@ export default function Home() {
       </motion.nav>
 
       {/* ============ NAV BAR PET DOG ============ */}
-      {/* A sleeping dog that sits on the left edge of the nav bar — like a
-          companion resting on the menu. Desktop only (mobile nav is too cramped). */}
+      {/* A sleeping dog that sits ON TOP of the nav bar (perched on the edge
+          like a companion pet). Desktop only (mobile nav is too cramped).
+          Positioned to overlap the nav bar's left edge, sitting on top of it. */}
       {!isMobile && (
         <motion.div
-          initial={{ opacity: 0, x: -30, y: -10 }}
-          animate={{ opacity: 1, x: 0, y: 0 }}
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, type: 'spring', stiffness: 80, damping: 12 }}
           style={{
             position: 'fixed',
-            top: '18px',
-            left: 'calc((100vw - 1140px) / 2 - 70px)',
+            // Nav bar is at top:26px, height ~52px. Dog sits ON the bar,
+            // so bottom of dog aligns with top of nav bar content.
+            // Dog is 50px tall, perched so its bottom edge is at nav bar's vertical center.
+            top: '30px',
+            // Position dog at the left edge of the nav bar, slightly overlapping
+            // Nav bar left edge is at 22px, dog overlaps by sitting on top
+            left: '30px',
             zIndex: 51,
-            width: '60px',
-            height: '60px',
+            width: '50px',
+            height: '50px',
             pointerEvents: 'none',
             imageRendering: 'pixelated',
           }}
@@ -4397,8 +4403,8 @@ export default function Home() {
         style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
         className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-16 md:pt-32 md:pb-20"
       >
-        {/* Flying bird — circles around the hero section, flapping wings.
-            Uses a motion path animation to make it look like it's flying. */}
+        {/* Flying bird — Bird 1: flies RIGHT across the hero, then flips and
+            flies LEFT back. Always faces the direction it's moving. */}
         {!isMobile && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -4419,12 +4425,17 @@ export default function Home() {
               src="/animals/bird.gif"
               alt="Flying bird"
               animate={{
-                x: [0, 200, 400, 600, 400, 200, 0, -200, -100, 0],
-                y: [0, -80, -40, 20, 60, 30, -20, 40, -60, 0],
-                rotate: [0, 10, -5, 8, -3, 5, -8, 3, -5, 0],
+                // Path: right → arc up → right → dive down → loop back left → return
+                x: [0, 300, 500, 400, 200, 0, -200, -100, 0],
+                y: [0, -60, -20, 40, 20, -30, 10, -50, 0],
+                // Flip to face direction: 1 = facing right, -1 = facing left
+                // Bird GIF faces RIGHT by default
+                scaleX: [1, 1, 1, 1, 1, -1, -1, 1, 1],
+                // Subtle banking rotation
+                rotate: [0, 8, 0, -5, 0, -8, 0, 5, 0],
               }}
               transition={{
-                duration: 18,
+                duration: 20,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
@@ -4438,7 +4449,8 @@ export default function Home() {
           </motion.div>
         )}
 
-        {/* Second bird — different flight path on the right side */}
+        {/* Second bird — Bird 2: flies LEFT first (starts facing left), then
+            flips and flies RIGHT. Always faces movement direction. */}
         {!isMobile && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -4459,13 +4471,15 @@ export default function Home() {
               src="/animals/bird.gif"
               alt="Flying bird"
               animate={{
-                x: [0, -150, -300, -200, -50, 100, 250, 100, 0],
-                y: [0, 50, -30, -70, 20, 60, -20, -50, 0],
-                rotate: [0, -8, 5, -3, 8, -5, 3, -8, 0],
-                scaleX: [1, 1, -1, -1, 1, 1, -1, 1, 1],
+                // Path: left → arc → left → loop right → return
+                x: [0, -200, -350, -200, -50, 100, 250, 100, 0],
+                y: [0, 40, -20, -60, 10, 50, -10, -40, 0],
+                // Bird starts facing LEFT (scaleX: -1), flips to RIGHT (scaleX: 1) when moving right
+                scaleX: [-1, -1, -1, -1, 1, 1, 1, 1, -1],
+                rotate: [0, -8, 0, 5, 0, 8, 0, -5, 0],
               }}
               transition={{
-                duration: 22,
+                duration: 24,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
