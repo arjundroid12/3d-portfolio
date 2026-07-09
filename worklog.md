@@ -332,3 +332,39 @@ Stage Summary:
 - Live at https://arjun-portfolio-emc.pages.dev (scroll to Projects)
 - Both portfolio repos synced at 06e649d
 - SDN repo synced at a702b3a
+
+---
+Task ID: 9
+Agent: main (Super Z)
+Task: Update resume with clickable hyperlinks + highlight portfolio + add SDN project.
+
+Work Log:
+- Rewrote scripts/generate_resume.py with major updates:
+  * Hyperlinks: all contact info (email mailto:, phone tel:, GitHub, portfolio)
+    and all project URLs are now clickable ReportLab <link> tags with dark blue
+    underlined styling (ATS-safe)
+  * Portfolio highlight: cream/gold bordered callout box at the top of Key
+    Projects section with "PORTFOLIO HIGHLIGHT" header, full dungeon RPG
+    portfolio description, and clickable link to arjun-portfolio-emc.pages.dev
+  * SDN Controller project added as the first project entry (before SmartAgro)
+    with full description + clickable GitHub link
+  * Experience corrected: "Software Management & Marketing at Techify Inc."
+    -> "Website Management & Marketing Head at AIOrders x Foodswipe"
+    (matches what user told us earlier + experience page)
+  * Education dates: 2023-2027 -> 2022-2026 (matches experience page)
+  * Networking added to Core Skills (SDN, Ryu, P4, OpenFlow, Mininet, DDoS)
+  * Summary updated with portfolio link + AIOrders x Foodswipe reference
+- Generated PDF: 2 pages, 16 clickable hyperlink annotations (10 page 1, 6 page 2), 71KB
+- Copied to both /download/Arjun_Vashishtha_Resume.pdf and /public/resume.pdf
+  (so portfolio's Resume button serves the latest version)
+- Build clean, deployed to Cloudflare
+- Committed f1d5214, pushed to origin + backup
+
+Stage Summary:
+- Resume now has 16 clickable links (email, phone, GitHub, portfolio, all project URLs)
+- Portfolio is prominently highlighted with a gold-bordered callout box
+- SDN project included
+- Experience matches user's actual role (AIOrders x Foodswipe)
+- Live at https://arjun-portfolio-emc.pages.dev (Resume button in hero section)
+- Downloadable at https://arjun-portfolio-emc.pages.dev/resume.pdf
+- Both repos synced at f1d5214
