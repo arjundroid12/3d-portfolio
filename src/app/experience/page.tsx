@@ -210,7 +210,7 @@ export default function ExperiencePage() {
           padding: '40px 28px 60px',
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) auto',
-          gap: '16px',
+          gap: '32px',
           alignItems: 'center',
         }}
       >
@@ -248,30 +248,29 @@ export default function ExperiencePage() {
 
         {/* Wizard character — clickable, speech bubble on click */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {/* Speech bubble — OVERLAPPING the wizard's left side, vertically
-              centered. Negative right offset pushes the bubble INTO the wizard
-              so it stays close and looks like the wizard is speaking directly
-              into it. High z-index so bubble sits above the wizard image. */}
+          {/* Speech bubble — to the LEFT of the wizard, vertically centered.
+              Wizard GIF has been cropped to its actual sprite (no padding),
+              so a clean 14px gap looks right. Tail points right toward wizard. */}
           {showWizardBubble && (
             <div
               style={{
                 position: 'absolute',
-                right: 'calc(100% - 90px)',
+                right: 'calc(100% + 14px)',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                maxWidth: '320px',
+                maxWidth: '300px',
                 width: 'max-content',
-                padding: '14px 16px',
-                background: 'rgba(15,12,25,0.97)',
+                padding: '12px 14px',
+                background: 'rgba(15,12,25,0.96)',
                 border: '1px solid rgba(168,85,247,0.55)',
                 borderRadius: '12px',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.7), 0 0 24px rgba(168,85,247,0.35)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.6), 0 0 18px rgba(168,85,247,0.25)',
                 fontFamily: 'var(--font-vt323), monospace',
-                fontSize: '18px',
+                fontSize: '17px',
                 lineHeight: 1.35,
                 color: '#e9d5ff',
                 textAlign: 'left',
-                zIndex: 8,
+                zIndex: 6,
                 animation: 'wizardBubbleIn 0.25s ease',
               }}
             >
@@ -285,7 +284,7 @@ export default function ExperiencePage() {
                   transform: 'translateY(-50%) rotate(45deg)',
                   width: '14px',
                   height: '14px',
-                  background: 'rgba(15,12,25,0.97)',
+                  background: 'rgba(15,12,25,0.96)',
                   borderTop: '1px solid rgba(168,85,247,0.55)',
                   borderRight: '1px solid rgba(168,85,247,0.55)',
                 }}
@@ -315,13 +314,15 @@ export default function ExperiencePage() {
               e.currentTarget.style.filter = 'drop-shadow(0 0 18px rgba(168,85,247,0.45)) drop-shadow(0 8px 12px rgba(0,0,0,0.7))'
             }}
           >
-            {/* Wizard.gif — 250x250 native, rendered at 580 (almost double the previous 300px).
-                imageRendering: pixelated keeps the blocky dungeon aesthetic crisp when upscaled. */}
+            {/* Wizard.gif — cropped to sprite (61x108 native), rendered at 200px.
+                The original 250x250 GIF had ~75% transparent padding around a
+                57x104 sprite. Cropped in scripts/crop_wizard.py so scaling
+                now enlarges the actual wizard, not empty pixels. */}
             <img
               src="/experience/wizard.gif"
               alt="Idle dungeon wizard"
-              width={580}
-              height={580}
+              width={200}
+              height={354}
               style={{ display: 'block', imageRendering: 'pixelated' }}
               draggable={false}
             />
