@@ -4254,10 +4254,9 @@ export default function Home() {
               // Nav bar is 52px tall (0 to 52px). Dog is 46px tall.
               // top: -20px → dog spans -20px to 26px. Bottom half on nav bar,
               // top half above. Clearly sitting on the edge.
-              // top: -60px → dog spans -60px to 4px. Just 4px on nav bar edge,
-              // 60px above. Barely touching the edge.
-              top: '-60px',
-              left: '30px',
+              // top: -64px → dog spans -64px to 0px. Bottom edge exactly on nav bar top.
+              top: '-64px',
+              left: '50px',
               zIndex: 55,
               width: '64px',
               height: '64px',
