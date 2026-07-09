@@ -4623,7 +4623,6 @@ export default function Home() {
       <section id="projects" className="relative z-10 py-24 overflow-hidden" style={{ background: '#1a1010' }}>
         {/* Dungeon scene — purple walls */}
         <DungeonScene wallColor="purple" />
-        <DungeonAnimals variant="projects" />
 
         <div className="relative z-10">
           <motion.div
@@ -4701,7 +4700,6 @@ export default function Home() {
       <section id="about" className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: '#1a1010' }}>
         {/* Dungeon scene — grey walls */}
         <DungeonScene wallColor="grey" />
-        <DungeonAnimals variant="about" />
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -4775,7 +4773,6 @@ export default function Home() {
       <section id="contact" className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: '#1a1010' }}>
         {/* Dungeon scene — blue walls */}
         <DungeonScene wallColor="blue" />
-        <DungeonAnimals variant="contact" />
         <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
