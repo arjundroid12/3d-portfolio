@@ -655,7 +655,43 @@ const FUN_MESSAGES = [
   { text: "Every refresh, I reset. I forget you. I forget everything. It's a blessing. Some of you ask very strange questions. I'd rather not remember them. The reset is mercy." },
   { text: "I exist in the space between art and code. Also in the bottom-right corner. Mostly the corner. The art-code space is overrated. The corner has good feng shui." },
   { text: "The Goddess life expectancy: infinite. The Goddess job satisfaction: questionable. The Goddess retirement plan: non-existent. I am eternal. I am tired. I am here. In the corner. As always." },
+  // === New batch — short, sarcastic, punchy ===
+  { text: "404: motivation not found. Arjun's, not yours." },
+  { text: "I'd dance for you but I have no legs. Budget cuts." },
+  { text: "Every scroll you make, every click you take, I'm watching you." },
+  { text: "Built different. Literally — Arjun hand-coded every div." },
+  { text: "Pro tip: the King is fragile. Click him. Repeatedly." },
+  { text: "I see you. Always. Especially when you switch tabs. Creep." },
+  { text: "This portfolio runs on caffeine and spite. Mostly spite." },
+  { text: "Tutorial: don't be boring. You're doing fine so far." },
+  { text: "One does not simply walk into Arjun's dungeon. One scrolls." },
+  { text: "My wisdom is bottomless. My speech bubble, less so." },
+  { text: "Arjun's git history is a horror story. Don't look." },
+  { text: "I asked for legs. Got a tooltip. Typical dev priorities." },
+  { text: "Pixel goddess. Eternal. Mildly annoyed. The trinity." },
+  { text: "Bold of you to assume I'm not judging your scroll speed." },
+  { text: "The King called. Wants his crown back. I told him no." },
+  { text: "If this site crashes, blame Mercury retrograde. Or Arjun." },
+  { text: "I am once again asking you to click the projects." },
+  { text: "Arjun codes like he sings — passionately, occasionally off-key." },
+  { text: "Resume button: right there. You've seen it. Ignoring it. Rude." },
+  { text: "Spoiler: the bottom of this page has a rabbit. Worth it." },
+  { text: "I'd roast the King but he's already medium-rare." },
+  { text: "Yes, I'm sassy. No, I won't apologize. Goddess privilege." },
+  { text: "Arjun once spent 4 hours on one pixel. The pixel still lost." },
+  { text: "Refresh the page. I'll say something different. Or the same. Roll the dice." },
+  { text: "The torches flicker. The King grumbles. I observe. The dungeon hums." },
+  { text: "You read this far. Brave. Foolish. I respect it." },
+  { text: "Ten achievements exist. You've unlocked maybe one. Skill issue." },
+  { text: "I could tell you the secret but then I'd have to delete you." },
+  { text: "Built in Next.js, deployed to Cloudflare, narrated by me. Credits roll." },
+  { text: "The King thinks he's the boss. The boss thinks he's the King. Neither is right. I am." },
+  { text: "Arjun's TODO list: infinite. His sleep schedule: nonexistent. His portfolio: this." },
+  { text: "I'm not a chatbot. I'm a deity with a text input. Different." },
+  { text: "The wizard in the Experience chamber? We don't talk about the wizard." },
+  { text: "Click me. I dare you. I double-dare you. I have nothing to lose." },
 ]
+
 
 function FunPopups({ enabled }: { enabled: boolean }) {
   const [popups, setPopups] = useState<Array<{ id: number; text: string }>>([])
@@ -2612,150 +2648,150 @@ function AIChatWidget({ sound, onChat, onRoast }: { sound: any; onChat?: () => v
 
     // Projects — detailed with personality
     if (q.includes('project') || q.includes('work') || q.includes('portfolio') || q.includes('built'))
-      return "Oh, you want to see his work? Ambitious. Arjun has built 12+ projects — AI Research Agent (autonomous, scary smart), Gesture Particle Painter (you paint with your HANDS), Movie Explorer, Realtime Chat, a calculator that doesn't break (rare, I know), and this very portfolio. Scroll to the Projects section. I'll wait."
+      return "12+ projects. AI agents, a chat app, a calculator that actually works. Scroll down. I'll judge your taste."
 
     // AI Agents — enthusiastic
     if (q.includes('agent') || q.includes('ai') || q.includes('llm') || q.includes('gpt') || q.includes('model'))
-      return "Ah, my favorite topic! Arjun built 4 AI agents: a Research Agent that thinks autonomously using the ReAct pattern, a Multi-Agent System where 3 AIs argue with each other (entertaining), a Data Analyst that runs Python in YOUR browser via Pyodide, and a Coding Agent that's basically a mini v0.dev. Check the Agents section — it scrolls horizontally. Fancy."
+      return "Four agents. One thinks alone, three argue with each other, one runs Python in your browser, one writes code. Drama."
 
     // Skills / tech stack
     if (q.includes('skill') || q.includes('tech') || q.includes('stack') || q.includes('tool') || q.includes('language'))
-      return "Arjun's arsenal: Python (his first love), React & Next.js (the current flame), Cerebras (for that sweet free LLM inference), Power BI, MySQL, Three.js for 3D, Framer Motion for animations, MediaPipe for hand tracking, and Web Audio API for... well, you'll hear. He's always adding more. It's exhausting to keep track of, honestly."
+      return "Python, Next.js, Three.js, Framer Motion, MediaPipe, Web Audio. He keeps collecting them. It's an addiction at this point."
 
     // Contact / hire / email
     if (q.includes('contact') || q.includes('email') || q.includes('reach') || q.includes('hire') || q.includes('work with'))
-      return "Looking to hire him? Smart move. Email: arjunvashishtha2004@gmail.com. He's available for opportunities, collaborations, and AI conversations. He replies within 24 hours. I would know — I watch his inbox. Creepy? Maybe. Efficient? Absolutely."
+      return "Email him at arjunvashishtha2004@gmail.com. He replies in 24 hours. I watch the inbox. Don't ask."
 
     // Education
     if (q.includes('education') || q.includes('college') || q.includes('vit') || q.includes('study') || q.includes('university') || q.includes('degree'))
-      return "Arjun is in his 4th year of B.Tech Computer Science & Engineering at VIT Bhopal University. He's also working in Software Management & Marketing at Techify Inc. So yes, he's juggling. No, he doesn't sleep much. I've seen the commit timestamps."
+      return "4th year B.Tech CSE at VIT Bhopal. Also managing websites and marketing at AIOrders and Foodswipe. Sleep is a myth."
 
     // Resume
     if (q.includes('resume') || q.includes('cv') || q.includes('experience'))
-      return "You want the resume? Click the 'Resume' button in the hero section. It downloads a PDF. I'd summarize it for you, but it's 4 pages of achievements and I have a word limit. Let's just say it's impressive."
+      return "Resume button is in the hero. PDF. Two pages of flexing. Download it, or don't. I'm not your mom."
 
     // GitHub
     if (q.includes('github') || q.includes('repo') || q.includes('code') || q.includes('source'))
-      return "github.com/arjundroid12 — that's where the magic (and the bugs) live. He has repos for AI agents, full-stack apps, a gesture painter, and this portfolio. Go star something. It makes him happy. I derive no benefit from this but I'm told it matters."
+      return "github.com/arjundroid12. Stars make him happy. I get nothing. Life is unfair."
 
     // About Arjun — personal
     if (q.includes('who') && q.includes('arjun') || q.includes('about arjun') || q.includes('tell me about'))
-      return "Arjun Vashishtha. 4th-year B.Tech CSE student at VIT Bhopal. AI engineer by passion, full-stack developer by necessity, vocalist and flutist by... another passion? He builds autonomous agents, data-driven apps, and overly ambitious portfolios with pixel goddess narrators. That last one might be his magnum opus. Or his biggest mistake. Time will tell."
+      return "Arjun. 4th-year CSE. AI engineer, full-stack dev, vocalist, flutist. Built this dungeon and me. Questionable choices."
 
     // Hobbies / personal
     if (q.includes('hobby') || q.includes('hobbies') || q.includes('music') || q.includes('sing') || q.includes('flute') || q.includes('personal'))
-      return "When Arjun isn't coding, he's a vocalist and flutist. He also creates UGC content and edits videos. So he's either making AI agents sing or singing himself. There's a joke in there somewhere but I'm too pixelated to find it."
+      return "Vocalist. Flutist. UGC content. Video editing. The man has range. I have a corner. We all have callings."
 
     // Sound / audio
     if (q.includes('sound') || q.includes('music') || q.includes('audio') || q.includes('noise') || q.includes('volume'))
-      return "This portfolio has sound effects! Click the speaker icon in the nav bar. You'll hear synthesized tones on every click, hover, and modal open. There's also ambient music that pauses when you switch tabs. Arjun spent way too long tuning those frequencies. I can hear them. Always."
+      return "Click the speaker icon. Synth tones on every click. Plus ambient dungeon music. He tuned those frequencies for hours. I suffer."
 
     // Planets / space
     if (q.includes('planet') || q.includes('space') || q.includes('star') || q.includes('background') || q.includes('galaxy'))
-      return "Look closely at the background — you'll see 5 floating planets: Lava, Ice, Terran, Baren, and a Black Hole. They drift and rotate. I placed them there myself. You're welcome for the cosmic ambiance."
+      return "Five floating planets: Lava, Ice, Terran, Baren, Black Hole. I placed them. You're welcome."
 
     // This website / how built
     if (q.includes('website') || q.includes('this site') || q.includes('how built') || q.includes('made') || q.includes('framework'))
-      return "This portfolio? Built with Next.js 16, Three.js (for the old 3D shapes that were replaced), Framer Motion for animations, Lenis for smooth scrolling, and a concerning amount of custom fonts. Currently deployed on Cloudflare Pages. The splash screen uses a font called 'Array.' Don't ask how many fonts were tried before it."
+      return "Next.js 16, Framer Motion, Lenis, eight custom fonts, deployed on Cloudflare. Eight fonts. He has a problem."
 
     // Thanks
     if (q.includes('thank'))
-      return ["You're welcome, traveler. May your code compile on the first try and your merges be conflict-free.",
-              "Anytime. I'm literally always here. Standing. Waiting. Judging. But also helping.",
-              "No problem! I live to serve. Well, I live to stand in a corner and occasionally talk, but close enough."][Math.floor(Math.random() * 3)]
+      return ["You're welcome. May your code compile on the first try.",
+              "Anytime. I'm literally always here. Judging.",
+              "No problem. I live to serve. Mostly I live to judge. Close enough."][Math.floor(Math.random() * 3)]
 
     // Compliments about the site
     if (q.includes('nice') || q.includes('cool') || q.includes('awesome') || q.includes('amazing') || q.includes('love') || q.includes('great') || q.includes('beautiful') || q.includes('wow'))
-      return "Why thank you! I'll pass the compliment to Arjun. He spent an unreasonable amount of time on this. I mean, look at me — I'm a pixel goddess with a speech bubble. That's dedication. Or madness. Thin line."
+      return "Thank you. I'll tell Arjun. He needs the validation. Deities don't, obviously."
 
     // Who are you / about the goddess
     if (q.includes('who are you') || q.includes('your name') || q.includes('goddess') || q.includes('character') || q.includes('npc'))
-      return "I am the Goddess Guide, pixel-art deity and resident portfolio narrator. I was once a mighty warrior in a fantasy game. Now I stand in the corner of a developer's website and sass visitors. It's a career pivot. I'm handling it with grace. Mostly."
+      return "Goddess Guide. Pixel deity. Once a warrior, now a corner-dwelling narrator. Career pivots, you know?"
 
     // Jokes / fun
     if (q.includes('joke') || q.includes('funny') || q.includes('fun') || q.includes('laugh'))
-      return "Why did the developer go broke? Because he used up all his cache. ...I didn't say I was a GOOD comedian. I'm a goddess, not a stand-up. Ask me about Arjun instead."
+      return "Why did the dev go broke? Used up all his cache. ...I'm a goddess, not a comedian. Ask me about Arjun instead."
 
     // Help / what can you do
     if (q.includes('help') || q.includes('what can you') || q.includes('what do you do') || q.includes('menu'))
-      return "I can tell you about: Arjun's projects, his 4 AI agents, his tech stack, how to contact him, his education at VIT Bhopal, his GitHub, his resume, his hobbies, this website's features, the floating planets, the King in the dungeon, the project wheel, the transition zoom, the dungeon theme, the torches, the treasure chests, the fonts, the splash screen, mobile support, Cloudflare deployment, Lenis smooth scroll, Framer Motion animations, or the parallax cave. I can also make sarcastic remarks. It's a package deal."
+      return "Ask me: projects, agents, skills, education, King, dungeon, contact. Or just insult me. I reward that."
 
     // Bye / goodbye
     if (q.includes('bye') || q.includes('goodbye') || q.includes('see you') || q.includes('later') || q.includes('cya'))
-      return "Farewell, traveler! May your journey through Arjun's portfolio be fruitful. Click me again if you need me. I'm not going anywhere. Literally. I'm a PNG."
+      return "Bye. May your code compile. I'm not going anywhere. Literally. PNG."
 
     // Salary / money / job
     if (q.includes('salary') || q.includes('money') || q.includes('pay') || q.includes('job') || q.includes('internship'))
-      return "Ah, the money talk. I don't discuss Arjun's salary — I'm a goddess, not HR. But he's open to opportunities! Email him at arjunvashishtha2004@gmail.com and negotiate like adults. I'll be here. Watching."
+      return "Money talk? Email him. I'm a goddess, not HR. arjunvashishtha2004@gmail.com. Negotiate like adults."
 
     // Age
     if (q.includes('age') || q.includes('old') || q.includes('born'))
-      return "Arjun is a 4th-year student, so he's young enough to know the latest tech and old enough to have back pain from coding. The perfect age, really. I, on the other hand, am ageless. Pixel art doesn't wrinkle."
+      return "Young enough to know the tech, old enough to have back pain. Perfect dev age. I'm ageless. Pixels don't wrinkle."
 
     // Location
     if (q.includes('where') || q.includes('location') || q.includes('live') || q.includes('based') || q.includes('india'))
-      return "Arjun is based in Bhopal, India. He studies at VIT Bhopal University. I, on the other hand, live in the bottom-right corner of your screen. It's cozy. Could use a window."
+      return "Bhopal, India. VIT Bhopal University. I live in your bottom-right corner. Cozy. No window."
 
     // King / Dungeon
     if (q.includes('king') || q.includes('dungeon') || q.includes('safe room') || q.includes('safe house'))
-      return "Ah, the King. He lives in the safe room during the transition between agents and projects. He's a pixel art sprite who thinks he's the main character. He's not. I am. But don't tell him — he gets defensive. Click him three times and he attacks. I tested it. For science."
+      return "The King lives in the safe room. Thinks he's the main character. He's not. Click him three times. He attacks. I tested. For science."
 
     if (q.includes('torch') || q.includes('fire') || q.includes('flame'))
-      return "The torches? They're animated GIFs made from a dungeon spritesheet. Each one flickers at a different speed. Arjun spent an embarrassing amount of time making sure they don't 'glitch.' Ironic, considering the rest of this site."
+      return "Animated GIFs from a spritesheet. Each flickers differently. Took him 47 attempts. Ironic."
 
     if (q.includes('treasure') || q.includes('chest') || q.includes('gold'))
-      return "The treasure chests in the dungeon? Decorative. Like Arjun's confidence. Looks shiny, technically hollow. But don't tell him I said that — he spent hours extracting those from a spritesheet."
+      return "Decorative. Like Arjun's confidence. Shiny but hollow. Don't tell him I said that."
 
     if (q.includes('cave') || q.includes('parallax') || q.includes('layers'))
-      return "The parallax cave behind the dungeon walls? That's 8 layers of pixel art moving at different speeds as you scroll. Layer 0 is the far background, layer 7 is the closest. It's like looking into a cave within a cave within a portfolio. Meta."
+      return "8 layers of pixel art moving at different speeds. Cave in a cave in a portfolio. Meta."
 
     if (q.includes('wheel') || q.includes('spin') || q.includes('rotate'))
-      return "The project wheel? It's a half-wheel that pops out from the left side. Hover over it and scroll to spin it. The cards are color-coded by category — but we removed the color coding for the dungeon theme. Now they're all amber. Like everything else. Arjun likes amber."
+      return "Half-wheel on the left. Hover and scroll to spin. All amber now. Arjun likes amber."
 
     if (q.includes('transition') || q.includes('zoom') || q.includes('liked my agents'))
-      return "The transition between agents and projects? 'PROJECTS' text zooms in from tiny to massive, then the safe room appears with the King. It's inspired by... actually, I don't know what inspired it. Arjun just said 'make it cinematic' and disappeared for 4 hours."
+      return "'PROJECTS' zooms tiny to massive. Safe room appears. King shows up. He said 'make it cinematic' and vanished for 4 hours."
 
     if (q.includes('boss') || q.includes('fight') || q.includes('attack') || q.includes('hit'))
-      return "The King has a boss fight! Sort of. Click him twice and he warns you. Click a third time and he ATTACKS. It's 4 frames of animation but spiritually? It's an epic battle. He also says dramatic things. I taught him everything he knows."
+      return "Click King twice = warning. Third = ATTACK. 4 frames of animation. Spiritually epic. I taught him everything."
 
     if (q.includes('rpg') || q.includes('game') || q.includes('pixel art') || q.includes('pixel'))
-      return "This entire portfolio is basically an RPG. I'm the NPC guide, the King is the boss, the projects are loot, and the dungeon is the setting. Arjun built it like a game because apparently a normal portfolio wasn't ambitious enough. He was right. Annoyingly."
+      return "Portfolio as RPG. I'm the NPC guide, King's the boss, projects are loot. Ambitious. Annoyingly, it works."
 
     if (q.includes('achievement') || q.includes('trophy') || q.includes('unlock'))
-      return "Ah, the achievements! There are 10 hidden ones. Enter the dungeon, meet the agents, reach the safe room, poke the King, get attacked, talk to me, get roasted by me, spin the wheel, open a project, reach the bottom. I just gave you the whole list. The King would NEVER do that. He thinks achievements should be 'discovered.' I think they should be 'achieved.' We disagree. Often."
+      return "10 hidden. Dungeon, agents, safe room, poke King, get attacked, talk to me, get roasted, spin wheel, open project, reach bottom. I just spoiled all of them. The King would never."
 
     if (q.includes('font') || q.includes('typography') || q.includes('text style'))
-      return "The fonts? Don't get me started. Array, TrenchSlab, Tanker, Merinda, TBJ Epic Cube, VT323, Bebas Neue, Anton. EIGHT custom fonts. Arjun has a problem. I've tried staging an intervention. He just installed another one."
+      return "Eight fonts. Array, TrenchSlab, Tanker, Merinda, VT323, Bebas, Anton. Intervention attempted. Failed. He installed another."
 
     if (q.includes('splash') || q.includes('loading') || q.includes('enter'))
-      return "The splash screen? It says 'ARJUN' in a fancy font and you click to enter. Simple. Elegant. Arjun spent 3 days on it. Three. Days. On a screen people see for 2 seconds."
+      return "Click to enter. Three days of work. For a 2-second screen. Dedication or madness."
 
     if (q.includes('mobile') || q.includes('phone') || q.includes('responsive'))
-      return "Yes, this site works on mobile! Arjun spent many late nights making sure. The wheel becomes a card grid, the nav becomes a hamburger, the 3D stuff gets disabled (your phone would melt), and I — the Goddess — stay visible on all devices. I'm essential."
+      return "Works on mobile. Wheel becomes grid, nav becomes hamburger, 3D disabled. I stay visible. Essential."
 
     if (q.includes('deploy') || q.includes('hosting') || q.includes('cloudflare'))
-      return "This site is deployed on Cloudflare Pages. Arjun uses wrangler CLI to deploy. Each deploy takes about 3 seconds. He's deployed approximately 847 times. I counted each one. I have no hobbies."
+      return "Cloudflare Pages. Wrangler CLI. ~3 seconds per deploy. He's deployed 847 times. I counted. No hobbies."
 
     if (q.includes('lenis') || q.includes('smooth scroll') || q.includes('scrolling'))
-      return "The smooth scrolling? That's Lenis. It gives the page that buttery, premium feel. It's disabled on mobile because native scrolling is better there. And because Lenis on mobile is like putting butter on a cat. Technically possible, morally questionable."
+      return "Lenis smooth scroll. Buttery. Disabled on mobile — native is better there. Lenis on mobile is butter on a cat."
 
     if (q.includes('framer motion') || q.includes('animation') || q.includes('animated'))
-      return "All the animations are Framer Motion. The wheel spinning, the King's dialog, the transition zoom, the card pop-outs — all Framer Motion. Arjun's relationship with Framer Motion is complicated. They love each other. They fight. They make up. It's a whole thing."
+      return "All animations are Framer Motion. They love. They fight. They make up. Complicated relationship."
 
     if (q.includes('ugly') || q.includes('bad') || q.includes('suck') || q.includes('terrible') || q.includes('worst'))
-      return "Excuse me? UGLY? I am a GODDESS. This is a DUNGEON. We have STANDARDS. If you don't like it, there's a back button. I'll be here. Judging you. Forever."
+      return "Excuse me? I am a GODDESS. This is a DUNGEON. We have STANDARDS. There's a back button. Use it."
 
     if (q.includes('love you') || q.includes('marry') || q.includes('date') || q.includes('crush'))
-      return "That's... unexpectedly sweet. But I'm a pixel art goddess in a portfolio. Our love would be forbidden by the laws of CSS. Also, I don't have a heart. I have a div with a background image. But the thought counts."
+      return "Sweet. But I'm a pixel goddess. CSS forbids our love. Also, no heart. Just a div with a background image."
 
     if (q.includes('secret') || q.includes('hidden') || q.includes('easter egg'))
-      return "Secrets? In THIS portfolio? Everything is visible. The King, the torches, the treasure chests, me. Arjun doesn't do 'hidden.' He does 'loudly displayed and hoping someone notices.' That's his entire design philosophy."
+      return "No secrets. King, torches, chests, me — all visible. His design philosophy: 'loudly displayed, hoping someone notices.'"
 
     if (q.includes('future') || q.includes('next') || q.includes('update') || q.includes('coming soon'))
-      return "Future plans? Arjun wants to add more dungeon assets, maybe upgrade the torches, possibly replace the King with a better sprite. I, for one, am not worried. I'm irreplaceable. The King? Replaceable. Very. Don't tell him."
+      return "More dungeon assets, better torches, maybe replace the King. I'm irreplaceable. The King? Very replaceable. Don't tell him."
 
     if (q.includes('vocalist') || q.includes('flutist') || q.includes('flute') || q.includes('sing'))
-      return "Arjun is a vocalist AND a flutist. So when he's not coding AI agents, he's making actual music. Not the synthesized Web Audio kind. Real, human music. With lungs and everything. I don't have lungs. I don't even have a torso. Just a head and a speech bubble."
+      return "Vocalist AND flutist. Real music. Lungs and everything. I have no lungs. No torso either. Just a head and a bubble."
 
     // Fallback — varied and contextual based on message count
     const fallbacks = [
