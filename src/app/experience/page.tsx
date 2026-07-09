@@ -44,12 +44,12 @@ const WIZARD_LINES = [
 // Experience entries — Arjun's actual roles/education.
 const EXPERIENCE_ENTRIES = [
   {
-    role: 'Website Management',
+    role: 'Website Management & Marketing Head',
     org: 'AIOrders × Foodswipe',
     period: '2024 — Present',
     location: 'Remote',
     summary:
-      'Leading website management for AIOrders and Foodswipe while heading marketing across both brands. Owning site updates, performance tuning, and content drops alongside the marketing pipeline — campaigns, positioning, and growth experiments tied to each product launch.',
+      'Wearing two hats at AIOrders and Foodswipe — owning website management (site updates, performance tuning, content drops) while also heading marketing across both brands: campaigns, positioning, and growth experiments tied to each product launch.',
     tags: ['Website Management', 'Marketing Head', 'Growth', 'Cross-brand'],
     rarity: 'legendary',
   },
@@ -248,15 +248,17 @@ export default function ExperiencePage() {
 
         {/* Wizard character — clickable, speech bubble on click */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {/* Speech bubble */}
+          {/* Speech bubble — anchored to the RIGHT edge of the wizard column
+              so it grows leftward into the page (wizard is on the right side).
+              This keeps it on-screen instead of overflowing off the right edge. */}
           {showWizardBubble && (
             <div
               style={{
                 position: 'absolute',
                 bottom: 'calc(100% + 14px)',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                maxWidth: '260px',
+                right: '0',
+                maxWidth: '280px',
+                width: 'max-content',
                 padding: '12px 14px',
                 background: 'rgba(15,12,25,0.96)',
                 border: '1px solid rgba(168,85,247,0.55)',
@@ -266,19 +268,19 @@ export default function ExperiencePage() {
                 fontSize: '17px',
                 lineHeight: 1.35,
                 color: '#e9d5ff',
-                textAlign: 'center',
+                textAlign: 'left',
                 zIndex: 6,
                 animation: 'wizardBubbleIn 0.25s ease',
               }}
             >
               {wizardLine}
-              {/* tail */}
+              {/* tail — positioned near the wizard's center (right side of bubble) */}
               <div
                 style={{
                   position: 'absolute',
                   bottom: '-8px',
-                  left: '50%',
-                  transform: 'translateX(-50%) rotate(45deg)',
+                  right: '40px',
+                  transform: 'rotate(45deg)',
                   width: '14px',
                   height: '14px',
                   background: 'rgba(15,12,25,0.96)',
@@ -311,12 +313,12 @@ export default function ExperiencePage() {
               e.currentTarget.style.filter = 'drop-shadow(0 0 18px rgba(168,85,247,0.45)) drop-shadow(0 8px 12px rgba(0,0,0,0.7))'
             }}
           >
-            {/* Wizard.gif — 250x250 */}
+            {/* Wizard.gif — 250x250 native, rendered at 240 */}
             <img
               src="/experience/wizard.gif"
               alt="Idle dungeon wizard"
-              width={180}
-              height={180}
+              width={240}
+              height={240}
               style={{ display: 'block', imageRendering: 'pixelated' }}
               draggable={false}
             />
@@ -475,8 +477,8 @@ export default function ExperiencePage() {
           50% { transform: translateY(-8px); }
         }
         @keyframes wizardBubbleIn {
-          from { opacity: 0; transform: translateX(-50%) translateY(6px); }
-          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </main>
