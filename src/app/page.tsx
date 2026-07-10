@@ -5481,15 +5481,15 @@ export default function Home() {
               onClick={(e) => e.stopPropagation()}
               style={{
                 position: 'absolute',
-                top: '50%',
+                top: '5vh',
                 right: isMobile ? '5vw' : '5vw',
                 width: isMobile ? '90vw' : '500px',
                 maxWidth: '90vw',
+                maxHeight: '90vh',
                 transformOrigin: 'center right',
-                marginTop: isMobile ? '-200px' : '-300px',
               }}
             >
-              <div className="relative border-2 rounded-2xl overflow-hidden shadow-2xl" style={{ background: 'rgba(20, 12, 5, 0.95)', borderColor: 'rgba(217, 119, 6, 0.5)', boxShadow: '0 25px 60px rgba(217, 119, 6, 0.2), 0 0 0 1px rgba(217, 119, 6, 0.1)' }}>
+              <div className="relative border-2 rounded-2xl shadow-2xl" style={{ background: 'rgba(20, 12, 5, 0.95)', borderColor: 'rgba(217, 119, 6, 0.5)', boxShadow: '0 25px 60px rgba(217, 119, 6, 0.2), 0 0 0 1px rgba(217, 119, 6, 0.1)', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
                 {/* Gradient top bar */}
                 <div className="h-1.5 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700" />
 
@@ -5501,8 +5501,8 @@ export default function Home() {
                   <X className="w-5 h-5 text-amber-400" />
                 </button>
 
-                {/* Content */}
-                <div className="p-8">
+                {/* Content — scrolls if modal is taller than 90vh */}
+                <div className="p-8 overflow-y-auto" style={{ flex: '1 1 auto' }}>
                   {/* Header */}
                   <div className="flex items-center gap-4 mb-6">
                     <span className="text-6xl">{selectedProject.icon}</span>
