@@ -215,7 +215,7 @@ story.append(portfolio_callout_table)
 story.append(Spacer(1, 8))
 
 story.append(Paragraph(
-    '13+ projects built across AI/ML, networking, full-stack, frontend, and backend. '
+    '14+ projects built across AI/ML, computer vision, networking, full-stack, frontend, and backend. '
     'Live demos and source code available on GitHub. Selected highlights:',
     body_style
 ))
@@ -232,6 +232,19 @@ story.extend(project_entry(
     'Python, Ryu, P4-16, OpenFlow 1.3, Mininet, Flask, D3.js, pytest, GitHub Actions',
     'https://github.com/arjundroid12/sdn-project',
     'github.com/arjundroid12/sdn-project'
+))
+
+story.extend(project_entry(
+    'SpellCaster — Gesture-Controlled Spellcasting',
+    'Gesture-controlled spellcasting web app. Make a hand sign with your webcam — MediaPipe Hands detects 21 landmarks '
+    'per hand in real time, the gesture classifier smooths out jitter, and a spell fires from your fingertip with neon '
+    'particle effects + synthesized Web Audio sounds. Six spells: Fireball (fist), Shield (open palm), Lightning (V sign), '
+    'Magic Missile (pinch), Heal (thumbs up), Ice Blast (flat sideways). Each spell has its own cooldown, particle system '
+    '(burst/beam/ring/trails), and synth sound. Pure vanilla JS — no build step, no deps, runs entirely in the browser. '
+    'Live demo deployed on GitHub Pages.',
+    'MediaPipe Hands, Web Audio API, Canvas 2D, Vanilla JS, GitHub Pages',
+    'https://arjundroid12.github.io/spellcaster',
+    'arjundroid12.github.io/spellcaster'
 ))
 
 story.extend(project_entry(
@@ -297,6 +310,7 @@ story.extend(project_entry(
 story.extend(section_header('Core Skills'))
 story.append(Paragraph('<b>Data Science &amp; Machine Learning:</b> &nbsp;Python (Pandas, NumPy, scikit-learn), CNN, Random Forest, NLP, exploratory data analysis, model building &amp; evaluation', body_style))
 story.append(Paragraph('<b>AI Engineering:</b> &nbsp;Cerebras, OpenAI API, ReAct Pattern, Multi-Agent Systems, Pyodide, LLM integration', body_style))
+story.append(Paragraph('<b>Computer Vision:</b> &nbsp;MediaPipe Hands, hand pose tracking, gesture recognition, real-time webcam processing, Canvas 2D rendering', body_style))
 story.append(Paragraph('<b>Networking:</b> &nbsp;Software-Defined Networking (SDN), Ryu Controller, P4, OpenFlow 1.3, Mininet, network topology discovery, DDoS detection', body_style))
 story.append(Paragraph('<b>Web Development:</b> &nbsp;JavaScript, TypeScript, React, Next.js 16, Node.js, Express, Tailwind CSS, Framer Motion, Three.js', body_style))
 story.append(Paragraph('<b>Data &amp; Analytics:</b> &nbsp;Power BI, MySQL, Excel, data cleaning &amp; preprocessing, data visualization', body_style))
