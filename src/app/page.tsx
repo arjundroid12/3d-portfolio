@@ -1280,6 +1280,215 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
 // Premium blackish-purple background, white "ARJUN" wordmark.
 // Slide-up entrance, super-zoom-into-text exit transition.
 
+// ============ VERSION SELECTOR — FUN vs Boring ============
+
+function VersionSelector({ onFun, onBoring }: { onFun: () => void; onBoring: () => void }) {
+  const [hovered, setHovered] = useState<'fun' | 'boring' | null>(null)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.1 }}
+      transition={{ duration: 0.4 }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 200,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '48px',
+        background: '#0a0a0f',
+        cursor: 'pointer',
+      }}
+    >
+      {/* Title */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        style={{ textAlign: 'center' }}
+      >
+        <h2 style={{
+          fontFamily: '"TrenchSlab", sans-serif',
+          fontSize: 'clamp(28px, 5vw, 48px)',
+          fontWeight: 700,
+          color: '#e9e1f2',
+          marginBottom: '8px',
+          letterSpacing: '1px',
+        }}>
+          Choose your experience
+        </h2>
+        <p style={{ fontSize: '14px', color: '#6b6b80', letterSpacing: '2px', textTransform: 'uppercase' }}>
+          Two portfolios. One creator.
+        </p>
+      </motion.div>
+
+      {/* Two choices */}
+      <div style={{
+        display: 'flex',
+        gap: 'clamp(24px, 5vw, 64px)',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+      }}>
+        {/* FUN — Dungeon Portfolio */}
+        <motion.button
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
+          onClick={onFun}
+          onMouseEnter={() => setHovered('fun')}
+          onMouseLeave={() => setHovered(null)}
+          style={{
+            width: 'clamp(220px, 30vw, 320px)',
+            height: 'clamp(280px, 40vh, 380px)',
+            borderRadius: '24px',
+            border: `2px solid ${hovered === 'fun' ? 'rgba(250,204,21,0.8)' : 'rgba(250,204,21,0.25)'}`,
+            background: hovered === 'fun'
+              ? 'linear-gradient(160deg, rgba(30,20,12,0.95) 0%, rgba(20,14,8,0.98) 100%)'
+              : 'rgba(15,12,25,0.8)',
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+            transition: 'all 0.3s ease',
+            transform: hovered === 'fun' ? 'translateY(-8px) scale(1.03)' : 'translateY(0) scale(1)',
+            boxShadow: hovered === 'fun'
+              ? '0 0 60px rgba(250,204,21,0.3), 0 0 120px rgba(250,204,21,0.15), inset 0 0 30px rgba(250,204,21,0.05)'
+              : '0 10px 40px rgba(0,0,0,0.5)',
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+        >
+          {/* Glow accent line */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: '20%', right: '20%',
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent, rgba(250,204,21,0.8), transparent)',
+            opacity: hovered === 'fun' ? 1 : 0.4,
+            transition: 'opacity 0.3s ease',
+          }} />
+          {/* Icon */}
+          <div style={{
+            fontSize: '64px',
+            filter: hovered === 'fun' ? 'drop-shadow(0 0 20px rgba(250,204,21,0.6))' : 'none',
+            transition: 'filter 0.3s ease',
+          }}>🏰</div>
+          {/* Label */}
+          <div style={{
+            fontFamily: '"TrenchSlab", sans-serif',
+            fontSize: '32px',
+            fontWeight: 800,
+            color: '#fde68a',
+            textShadow: hovered === 'fun' ? '0 0 20px rgba(250,204,21,0.5)' : 'none',
+            transition: 'text-shadow 0.3s ease',
+            letterSpacing: '2px',
+          }}>FUN</div>
+          {/* Description */}
+          <div style={{
+            fontSize: '13px',
+            color: 'rgba(253,230,138,0.6)',
+            textAlign: 'center',
+            maxWidth: '220px',
+            lineHeight: 1.5,
+          }}>
+            Dungeon RPG portfolio with Goddess NPC, King, achievements, and pixel art
+          </div>
+        </motion.button>
+
+        {/* Boring — Terminal Portfolio */}
+        <motion.button
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 120 }}
+          onClick={onBoring}
+          onMouseEnter={() => setHovered('boring')}
+          onMouseLeave={() => setHovered(null)}
+          style={{
+            width: 'clamp(220px, 30vw, 320px)',
+            height: 'clamp(280px, 40vh, 380px)',
+            borderRadius: '24px',
+            border: `2px solid ${hovered === 'boring' ? 'rgba(126,207,255,0.8)' : 'rgba(126,207,255,0.2)'}`,
+            background: hovered === 'boring'
+              ? 'linear-gradient(160deg, rgba(26,27,38,0.95) 0%, rgba(19,19,26,0.98) 100%)'
+              : 'rgba(15,12,25,0.8)',
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+            transition: 'all 0.3s ease',
+            transform: hovered === 'boring' ? 'translateY(-8px) scale(1.03)' : 'translateY(0) scale(1)',
+            boxShadow: hovered === 'boring'
+              ? '0 0 60px rgba(126,207,255,0.3), 0 0 120px rgba(126,207,255,0.15), inset 0 0 30px rgba(126,207,255,0.05)'
+              : '0 10px 40px rgba(0,0,0,0.5)',
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+        >
+          {/* Glow accent line */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: '20%', right: '20%',
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent, rgba(126,207,255,0.8), transparent)',
+            opacity: hovered === 'boring' ? 1 : 0.4,
+            transition: 'opacity 0.3s ease',
+          }} />
+          {/* Icon */}
+          <div style={{
+            fontSize: '64px',
+            fontFamily: 'monospace',
+            filter: hovered === 'boring' ? 'drop-shadow(0 0 20px rgba(126,207,255,0.6))' : 'none',
+            transition: 'filter 0.3s ease',
+          }}>{'>'}_</div>
+          {/* Label */}
+          <div style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '28px',
+            fontWeight: 700,
+            color: '#7dcfff',
+            textShadow: hovered === 'boring' ? '0 0 20px rgba(126,207,255,0.5)' : 'none',
+            transition: 'text-shadow 0.3s ease',
+            letterSpacing: '1px',
+          }}>Boring</div>
+          {/* Description */}
+          <div style={{
+            fontSize: '13px',
+            color: 'rgba(126,207,255,0.5)',
+            textAlign: 'center',
+            maxWidth: '220px',
+            lineHeight: 1.5,
+            fontFamily: 'monospace',
+          }}>
+            Interactive terminal portfolio. Type commands, play snake, change themes
+          </div>
+        </motion.button>
+      </div>
+
+      {/* Footer hint */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        style={{
+          fontSize: '12px',
+          color: '#4a4a5a',
+          letterSpacing: '1px',
+        }}
+      >
+        Click a card to enter · You can switch anytime
+      </motion.p>
+    </motion.div>
+  )
+}
+
 function SplashScreen({ onEnter }: { onEnter: () => void }) {
   const [leaving, setLeaving] = useState(false)
 
@@ -4046,6 +4255,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
   const [entered, setEntered] = useState(false)
+  const [showVersionSelect, setShowVersionSelect] = useState(false)
   const [redTheme, setRedTheme] = useState(false)
   const [navOnWhite, setNavOnWhite] = useState(false)
   const [showTechGuy, setShowTechGuy] = useState(false)
@@ -4188,8 +4398,18 @@ export default function Home() {
     >
       {/* ============ SPLASH SCREEN (white + purple, click to enter) ============ */}
       <AnimatePresence>
-        {!entered && (
-          <SplashScreen onEnter={() => { setEntered(true); sound.playPop(); unlock('enter') }} />
+        {!entered && !showVersionSelect && (
+          <SplashScreen onEnter={() => { sound.playPop(); setShowVersionSelect(true) }} />
+        )}
+      </AnimatePresence>
+
+      {/* ============ VERSION SELECTOR (FUN vs Boring) ============ */}
+      <AnimatePresence>
+        {!entered && showVersionSelect && (
+          <VersionSelector
+            onFun={() => { sound.playPop(); setEntered(true); setShowVersionSelect(false); unlock('enter') }}
+            onBoring={() => { sound.playClick(); window.location.href = '/terminal.html' }}
+          />
         )}
       </AnimatePresence>
 
