@@ -4393,6 +4393,8 @@ export default function Home() {
       className="min-h-screen bg-[#0a0a0f] text-white"
       style={{
         overflowX: 'clip',
+        // Hide all content while splash is showing — prevents lag from 3D + animations loading
+        visibility: entered ? 'visible' : 'hidden',
         // Apply screen shake animation when King attacks
         animation: shake ? 'kingShake 0.4s cubic-bezier(.36,.07,.19,.97) both' : undefined,
       }}
@@ -4412,7 +4414,7 @@ export default function Home() {
       )}
 
       {/* ============ FUN POPUPS ============ */}
-      {!isMobile && <FunPopups enabled={sound.enabled} />}
+      {!isMobile && entered && <FunPopups enabled={sound.enabled} />}
 
       {/* ============ SCROLL WARP OVERLAY ============ */}
       <AnimatePresence>
