@@ -2,6 +2,7 @@
 
 // Arjun Vashishtha — Premium 3D Portfolio
 // Last updated: EDITION 2026 — splash screen, horizontal agents scroll, red/black theme shift
+import ExperienceSplash from './ExperienceSplash';
 
 import { useRef, useState, useEffect, Suspense, useCallback, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
@@ -4396,19 +4397,17 @@ export default function Home() {
         animation: shake ? 'kingShake 0.4s cubic-bezier(.36,.07,.19,.97) both' : undefined,
       }}
     >
-      {/* ============ SPLASH SCREEN + VERSION SELECTOR ============ */}
-      {/* Version selector is rendered OUTSIDE AnimatePresence with a solid
-          background at z-index 200 — covers everything instantly when shown.
-          No AnimatePresence delay, no dungeon flash. */}
-      <AnimatePresence>
-        {!entered && !showVersionSelect && (
-          <SplashScreen key="splash" onEnter={() => { sound.playPop(); setShowVersionSelect(true) }} />
-        )}
-      </AnimatePresence>
-      {!entered && showVersionSelect && (
-        <VersionSelector
-          onFun={() => { sound.playPop(); setEntered(true); setShowVersionSelect(false); unlock('enter') }}
-          onBoring={() => { sound.playClick(); window.location.href = '/terminal.html' }}
+      {/* ============ EXPERIENCE SPLASH (intro + two-doors chooser) ============ */}
+      {!entered && (
+        <ExperienceSplash
+          onChoose={(choice) => {
+            if (choice === 'terminal') {
+              window.location.href = '/terminal.html';
+            } else {
+              setEntered(true);
+              unlock('enter');
+            }
+          }}
         />
       )}
 
