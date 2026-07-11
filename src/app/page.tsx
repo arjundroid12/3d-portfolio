@@ -4389,6 +4389,20 @@ export default function Home() {
 
   return (
     <SmoothScroll>
+    {/* ============ EXPERIENCE SPLASH (intro + two-doors chooser) ============ */}
+    {/* Rendered OUTSIDE the main content div so visibility:hidden doesn't hide it */}
+    {!entered && (
+      <ExperienceSplash
+        onChoose={(choice) => {
+          if (choice === 'terminal') {
+            window.location.href = '/terminal.html';
+          } else {
+            setEntered(true);
+            unlock('enter');
+          }
+        }}
+      />
+    )}
     <div
       className="min-h-screen bg-[#0a0a0f] text-white"
       style={{
@@ -4399,19 +4413,6 @@ export default function Home() {
         animation: shake ? 'kingShake 0.4s cubic-bezier(.36,.07,.19,.97) both' : undefined,
       }}
     >
-      {/* ============ EXPERIENCE SPLASH (intro + two-doors chooser) ============ */}
-      {!entered && (
-        <ExperienceSplash
-          onChoose={(choice) => {
-            if (choice === 'terminal') {
-              window.location.href = '/terminal.html';
-            } else {
-              setEntered(true);
-              unlock('enter');
-            }
-          }}
-        />
-      )}
 
       {/* ============ FUN POPUPS ============ */}
       {!isMobile && entered && <FunPopups enabled={sound.enabled} />}
