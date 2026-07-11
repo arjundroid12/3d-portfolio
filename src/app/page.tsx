@@ -4257,6 +4257,13 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
   const [entered, setEntered] = useState(false)
   const [showVersionSelect, setShowVersionSelect] = useState(false)
+
+  // Remember if user already chose a portfolio — skip splash on back/refresh
+  useEffect(() => {
+    if (sessionStorage.getItem('quirk-experience') === 'dungeon') {
+      setEntered(true)
+    }
+  }, [])
   const [redTheme, setRedTheme] = useState(false)
   const [navOnWhite, setNavOnWhite] = useState(false)
   const [showTechGuy, setShowTechGuy] = useState(false)
@@ -4395,8 +4402,10 @@ export default function Home() {
       <ExperienceSplash
         onChoose={(choice) => {
           if (choice === 'terminal') {
+            sessionStorage.setItem('quirk-experience', 'terminal');
             window.location.href = '/terminal.html';
           } else {
+            sessionStorage.setItem('quirk-experience', 'dungeon');
             setEntered(true);
             unlock('enter');
           }
