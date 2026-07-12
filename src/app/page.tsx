@@ -1751,11 +1751,11 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
                 key={agent.name}
                 className={isMobileView ? "relative w-full h-auto min-h-[400px] rounded-3xl overflow-hidden flex flex-col mx-auto" : "relative shrink-0 w-[88vw] md:w-[55vw] lg:w-[42vw] h-[60vh] md:h-[56vh] rounded-3xl overflow-hidden flex flex-col mx-auto"}
                 style={{
-                  background: bg,
-                  backdropFilter: 'blur(1px)',
-                  WebkitBackdropFilter: 'blur(1px)',
-                  border: '1px solid rgba(167, 139, 250, 0.15)',
-                  boxShadow: '0 25px 80px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.004) 45%, rgba(255,255,255,0.012))',
+                  backdropFilter: 'blur(12px) saturate(140%)',
+                  WebkitBackdropFilter: 'blur(12px) saturate(140%)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: '0 25px 80px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 0 0 1px rgba(255,255,255,0.06), 0 0 0 1px rgba(255,255,255,0.03)',
                 }}
                 onMouseEnter={() => sound.playHover()}
               >
@@ -4348,12 +4348,11 @@ export default function Home() {
     target: redThemeRef,
     offset: ['start end', 'end start'],
   })
-  // Red overlay: fully visible when agents section is in middle of viewport,
-  // fades out GRADUALLY as you scroll past it (no hard line)
+  // Purple overlay: subtle, max 40% opacity — doesn't look solid
   const redOverlayOpacity = useTransform(
     agentsScrollProgress,
     [0, 0.15, 0.5, 0.85, 1],
-    [0, 1, 1, 0.3, 0]
+    [0, 0.4, 0.4, 0.15, 0]
   )
 
   // Keep the boolean for other logic
