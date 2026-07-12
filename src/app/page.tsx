@@ -4255,13 +4255,7 @@ export default function Home() {
 
   const [mounted, setMounted] = useState(false)
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null)
-  const [entered, setEntered] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const c = sessionStorage.getItem('quirk-experience')
-      return c === 'dungeon' || c === 'terminal'
-    }
-    return false
-  })
+  const [entered, setEntered] = useState(false)
   const [showVersionSelect, setShowVersionSelect] = useState(false)
   const [redTheme, setRedTheme] = useState(false)
   const [navOnWhite, setNavOnWhite] = useState(false)
@@ -4401,10 +4395,8 @@ export default function Home() {
       <ExperienceSplash
         onChoose={(choice) => {
           if (choice === 'terminal') {
-            sessionStorage.setItem('quirk-experience', 'terminal');
             window.location.href = '/terminal.html';
           } else {
-            sessionStorage.setItem('quirk-experience', 'dungeon');
             setEntered(true);
             unlock('enter');
           }
