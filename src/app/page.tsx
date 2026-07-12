@@ -97,36 +97,11 @@ function useSoundEffects() {
     setTimeout(() => playTone(1047, 0.2, 'sine', 0.04), 240)
   }, [playTone])
 
-  // ============ SIMPLE AMBIENT MUSIC ============
+  // ============ AMBIENT MUSIC (DISABLED — user requested removal) ============
   const musicNodesRef = useRef<any>(null)
 
   const startMusic = useCallback(() => {
-    if (musicNodesRef.current) return
-    try {
-      const ctx = getCtx()
-      const masterGain = ctx.createGain()
-      masterGain.gain.setValueAtTime(0, ctx.currentTime)
-      masterGain.gain.linearRampToValueAtTime(0.025, ctx.currentTime + 2)
-      masterGain.connect(ctx.destination)
-
-      // Single sustained chord — C major (C3 + E3 + G3)
-      const freqs = [130.81, 164.81, 196.00]
-      const oscillators: any[] = []
-
-      freqs.forEach((freq, i) => {
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.type = 'sine'
-        osc.frequency.value = freq
-        gain.gain.value = 0.33
-        osc.connect(gain)
-        gain.connect(masterGain)
-        osc.start()
-        oscillators.push(osc)
-      })
-
-      musicNodesRef.current = { masterGain, oscillators }
-    } catch {}
+    // Ambient drone disabled — only UI sounds remain
   }, [getCtx])
 
   const stopMusic = useCallback(() => {
