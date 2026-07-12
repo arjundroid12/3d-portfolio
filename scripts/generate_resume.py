@@ -148,7 +148,7 @@ story.append(Paragraph('<b>ARJUN VASHISHTHA</b>', name_style))
 story.append(Paragraph('Full-Stack Developer &bull; AI Builder &bull; Data Science &bull; SDN Engineer', title_style))
 
 # Contact line — all links clickable
-PORTFOLIO_URL = 'https://arjun-portfolio-emc.pages.dev'
+PORTFOLIO_URL = 'https://arjunv.is-a.dev'
 GITHUB_URL = 'https://github.com/arjundroid12'
 EMAIL_URL = 'mailto:arjunvashishtha2004@gmail.com'
 PHONE_URL = 'tel:+919105459616'
@@ -158,7 +158,7 @@ contact_html = (
     f'{link(EMAIL_URL, "arjunvashishtha2004@gmail.com")} &nbsp;|&nbsp; '
     f'Bhopal, India &nbsp;|&nbsp; '
     f'{link(GITHUB_URL, "github.com/arjundroid12")} &nbsp;|&nbsp; '
-    f'{link(PORTFOLIO_URL, "arjun-portfolio-emc.pages.dev")}'
+    f'{link(PORTFOLIO_URL, "arjunv.is-a.dev")}'
 )
 story.append(Paragraph(contact_html, contact_style))
 
@@ -171,7 +171,7 @@ story.append(Paragraph(
     'Strong foundation in Python, machine learning, and data analytics, with hands-on experience building '
     'autonomous AI agents, full-stack web applications, SDN controllers, and data-driven solutions. '
     f'Passionate about shipping practical products that solve real problems. '
-    f'Live portfolio: {link(PORTFOLIO_URL, "arjun-portfolio-emc.pages.dev")}.',
+    f'Live portfolio: {link(PORTFOLIO_URL, "arjunv.is-a.dev")}.',
     body_style
 ))
 
@@ -191,12 +191,12 @@ story.extend(section_header('Key Projects'))
 # Portfolio callout box — a bordered Table with cream background + gold border
 portfolio_callout_text = Paragraph(
     f'<b><font color="#8b6914" size="12">&#127760; PORTFOLIO HIGHLIGHT</font></b><br/><br/>'
-    f'<b>{link(PORTFOLIO_URL, "Dungeon RPG Portfolio — arjun-portfolio-emc.pages.dev")}</b><br/>'
-    f'Premium dungeon/RPG-themed interactive portfolio built with Next.js 16, Framer Motion, and Web Audio API. '
-    f'Features 8-layer parallax cave backgrounds, animated King character with click-triggered attack sequences, '
-    f'Goddess NPC with 132 sarcastic dialog lines and 40+ topic knowledge base, achievement system (10 unlockables), '
-    f'treasure chest loot, RPG-style project cards with rarity borders, ambient castle music, and a dedicated '
-    f'Experience page with an interactive wizard character. Deployed on Cloudflare Pages.',
+    f'<b>{link(PORTFOLIO_URL, "Dual-Version Portfolio — arjunv.is-a.dev")}</b><br/>'
+    f'Premium dual-version interactive portfolio. FUN version: dungeon/RPG-themed with 8-layer parallax caves, '
+    f'animated King character, Goddess NPC with 167 sarcastic dialog lines, achievement system (10 unlockables), '
+    f'treasure chest loot, RPG-style project cards with rarity borders, ambient castle music, and an interactive '
+    f'terminal portfolio with playable Snake game and 4 themes. Built with Next.js 16, Framer Motion, Web Audio API. '
+    f'Deployed on Cloudflare Pages with custom domain arjunv.is-a.dev.',
     portfolio_callout_style
 )
 portfolio_callout_table = Table(
@@ -256,8 +256,8 @@ story.extend(project_entry(
     'picks winner with reasoning). Built with Next.js 16, Tailwind CSS 4, shadcn/ui, magic-link auth, Turso database, '
     'Z.AI GLM-4.5-flash for text AI, Groq Llama 4 Scout for vision. Deployed on Vercel. Live and fully functional.',
     'Next.js 16, TypeScript, Tailwind CSS 4, shadcn/ui, Turso, Z.AI GLM-4.5, Groq Llama 4, Vercel',
-    'https://my-project-kappa-ten-24.vercel.app',
-    'my-project-kappa-ten-24.vercel.app'
+    'https://quirk-ten.vercel.app',
+    'quirk-ten.vercel.app'
 ))
 
 story.extend(project_entry(
