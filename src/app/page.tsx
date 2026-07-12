@@ -4143,69 +4143,14 @@ function useScreenShake() {
 
 function useDungeonAmbient() {
   const [enabled, setEnabled] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const start = useCallback(() => {
-    try {
-      if (audioRef.current) {
-        // Already exists — just resume
-        audioRef.current.currentTime = audioRef.current.currentTime // keep position
-        void audioRef.current.play()
-        return
-      }
-      const audio = new Audio('/dungeon/ambient.mp3')
-      audio.loop = true
-      audio.volume = 0.45
-      // Don't preload metadata blocking — let it stream
-      audio.preload = 'auto'
-      audioRef.current = audio
-      void audio.play()
-    } catch {}
-  }, [])
-
-  const stop = useCallback(() => {
-    try {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        // Keep the element around so toggling back on resumes from same position
-      }
-    } catch {}
-  }, [])
+  // Ambient background music DISABLED — user requested removal
+  // Sound button still controls UI sounds (clicks, hovers, etc.)
+  const start = useCallback(() => {}, [])
+  const stop = useCallback(() => {}, [])
 
   const toggle = useCallback(() => {
-    setEnabled(prev => {
-      const next = !prev
-      if (next) start()
-      else stop()
-      return next
-    })
-  }, [start, stop])
-
-  // Pause when tab is hidden (saves resources), resume when visible (if enabled)
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (!audioRef.current) return
-      if (document.hidden && enabled) {
-        audioRef.current.pause()
-      } else if (!document.hidden && enabled) {
-        void audioRef.current.play()
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [enabled])
-
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      try {
-        if (audioRef.current) {
-          audioRef.current.pause()
-          audioRef.current.src = ''
-          audioRef.current = null
-        }
-      } catch {}
-    }
+    setEnabled(prev => !prev)
   }, [])
 
   return { enabled, toggle }
