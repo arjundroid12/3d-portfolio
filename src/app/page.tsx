@@ -4893,20 +4893,8 @@ export default function Home() {
             transition={{ delay: 0.2, duration: 1, type: 'spring' }}
             className="relative w-36 h-36 md:w-44 md:h-44 mx-auto mb-8"
           >
-            {/* Rotating gradient ring */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-              style={{
-                background: 'conic-gradient(from 0deg, #14b8a6, #fbbf24, #a855f7, #f97316, #14b8a6)',
-                padding: 4,
-              }}
-            >
-              <div className="w-full h-full rounded-full bg-[#0a0a0f]" />
-            </motion.div>
-            {/* Inner photo */}
-            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-teal-500/20 to-amber-500/20 backdrop-blur-xl border border-white/10 overflow-hidden">
+            {/* Inner photo — no ring, just clean photo */}
+            <div className="absolute inset-0 rounded-full overflow-hidden border border-white/10">
               <motion.img
                 src="/photo-new.png"
                 alt="Arjun Vashishtha"
@@ -4917,12 +4905,12 @@ export default function Home() {
                 style={{ objectPosition: 'center top' }}
               />
             </div>
-            {/* Pulsing glow */}
+            {/* Subtle glow */}
             <motion.div
               className="absolute inset-0 rounded-full blur-2xl -z-10"
-              animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }}
+              animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.05, 1] }}
               transition={{ duration: 3, repeat: Infinity }}
-              style={{ background: 'radial-gradient(circle, rgba(20,184,166,0.4), transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.3), transparent 70%)' }}
             />
           </motion.div>
 
