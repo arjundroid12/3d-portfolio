@@ -1256,6 +1256,34 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
 // Premium blackish-purple background, white "ARJUN" wordmark.
 // Slide-up entrance, super-zoom-into-text exit transition.
 
+// ============ MOBILE REDIRECT — phones skip splash, go to terminal ============
+
+function MobileRedirect() {
+  useEffect(() => {
+    // Check if already chose desktop (don't redirect if user forced desktop)
+    const saved = sessionStorage.getItem('arjun-view')
+    if (saved === 'desktop') return
+
+    // Check URL param
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('view') === 'desktop') {
+      sessionStorage.setItem('arjun-view', 'desktop')
+      return
+    }
+
+    // Detect phone
+    const ua = navigator.userAgent
+    const isPhone = /Android.*Mobile|iPhone|iPod|Windows Phone/i.test(ua)
+    const coarseSmall = window.matchMedia('(pointer: coarse)').matches && Math.min(window.innerWidth, window.screen.width) < 768
+
+    if (isPhone || coarseSmall) {
+      // Phone → redirect to terminal portfolio
+      window.location.href = '/terminal.html'
+    }
+  }, [])
+  return null
+}
+
 // ============ VERSION SELECTOR — FUN vs Boring ============
 
 function VersionSelector({ onFun, onBoring }: { onFun: () => void; onBoring: () => void }) {
@@ -4394,6 +4422,8 @@ export default function Home() {
 
   return (
     <SmoothScroll>
+    {/* ============ MOBILE REDIRECT — phones go straight to terminal ============ */}
+    <MobileRedirect />
     {/* ============ EXPERIENCE SPLASH (intro + two-doors chooser) ============ */}
     {/* Rendered OUTSIDE the main content div so visibility:hidden doesn't hide it */}
     {!entered && (
