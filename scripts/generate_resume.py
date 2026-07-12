@@ -216,19 +216,31 @@ story.append(Spacer(1, 8))
 
 story.append(Paragraph(
     '15+ projects built across AI products, computer vision, networking, full-stack, frontend, and backend. '
-    'Live demos and source code available on GitHub. Selected highlights:',
+    'Selected highlights below — see all projects with live demos at '
+    + link(PORTFOLIO_URL, 'arjunv.is-a.dev') + '.',
     body_style
 ))
 
-# ── Projects (all with clickable hyperlinks) ──
+# ── Top 3 Projects only (one page) ──
+
+story.extend(project_entry(
+    'QUIRK — AI Toolkit for Content Creators',
+    'AI-powered toolkit with three features: Script Studio (platform-specific scripts with hooks, pacing, CTAs + inline '
+    'AI editing), Idea Engine (generates 4-10 personalized content ideas per batch with niche/platform/tone controls + '
+    'idea bank with status pipeline), and Thumbnail Tester (upload 2-3 thumbnails, AI scores on composition/emotion/text '
+    'legibility/CTR, picks winner with reasoning). Built with Next.js 16, Tailwind CSS 4, shadcn/ui, magic-link auth, '
+    'Turso database, Z.AI GLM-4.5-flash for text AI, Groq Llama 4 Scout for vision. Deployed on Vercel. Live and fully functional.',
+    'Next.js 16, TypeScript, Tailwind CSS 4, shadcn/ui, Turso, Z.AI GLM-4.5, Groq Llama 4, Vercel',
+    'https://quirk-ten.vercel.app',
+    'quirk-ten.vercel.app'
+))
 
 story.extend(project_entry(
     'SDN Controller — Ryu + P4 + DDoS Detection',
-    'Custom Software-Defined Networking controller built on Ryu + OpenFlow 1.3 with a P4-16 data plane for BMv2. '
-    'Custom LLDP topology discovery, reactive L2 forwarding with BFS shortest-path computation, and a real-time '
-    'DDoS detector using threshold + entropy anomaly detection that auto-installs ACL drop flows on every switch. '
-    'Includes a Flask REST API (16 endpoints), D3.js real-time topology dashboard, sdnctl CLI tool, and a 66-test '
-    'pytest suite with GitHub Actions CI on Python 3.9/3.10/3.11.',
+    'Custom Software-Defined Networking controller on Ryu + OpenFlow 1.3 with a P4-16 data plane for BMv2. LLDP topology '
+    'discovery, reactive L2 forwarding with BFS shortest-path, and a real-time DDoS detector using threshold + entropy '
+    'anomaly detection that auto-installs ACL drop flows. Includes Flask REST API (16 endpoints), D3.js topology dashboard, '
+    'sdnctl CLI, and a 66-test pytest suite with GitHub Actions CI on Python 3.9/3.10/3.11.',
     'Python, Ryu, P4-16, OpenFlow 1.3, Mininet, Flask, D3.js, pytest, GitHub Actions',
     'https://github.com/arjundroid12/sdn-project',
     'github.com/arjundroid12/sdn-project'
@@ -236,88 +248,23 @@ story.extend(project_entry(
 
 story.extend(project_entry(
     'SpellCaster — Gesture-Controlled Spellcasting',
-    'Gesture-controlled spellcasting web app. Make a hand sign with your webcam — MediaPipe Hands detects 21 landmarks '
-    'per hand in real time, the gesture classifier smooths out jitter, and a spell fires from your fingertip with neon '
-    'particle effects + synthesized Web Audio sounds. Six spells: Fireball (fist), Shield (open palm), Lightning (V sign), '
-    'Magic Missile (pinch), Heal (thumbs up), Ice Blast (flat sideways). Each spell has its own cooldown, particle system '
-    '(burst/beam/ring/trails), and synth sound. Pure vanilla JS — no build step, no deps, runs entirely in the browser. '
-    'Live demo deployed on GitHub Pages.',
+    'Gesture-controlled spellcasting web app. MediaPipe Hands detects 21 landmarks per hand in real time, gesture classifier '
+    'smooths jitter, and a spell fires from your fingertip with neon particle effects + synthesized Web Audio sounds. Six '
+    'spells: Fireball (fist), Shield (open palm), Lightning (V sign), Magic Missile (pinch), Heal (thumbs up), Ice Blast '
+    '(flat sideways). Pure vanilla JS, no deps, runs entirely in browser. Live demo on GitHub Pages.',
     'MediaPipe Hands, Web Audio API, Canvas 2D, Vanilla JS, GitHub Pages',
     'https://arjundroid12.github.io/spellcaster',
     'arjundroid12.github.io/spellcaster'
 ))
 
-story.extend(project_entry(
-    'QUIRK — AI Toolkit for Content Creators',
-    'AI-powered toolkit that helps content creators plan, script, optimize, and grow — all in one workspace. Three AI '
-    'features: Script Studio (platform-specific scripts with hooks, pacing, CTAs + inline AI editing), Idea Engine '
-    '(generates 4-10 personalized content ideas per batch with niche/platform/tone controls + idea bank with status '
-    'pipeline), and Thumbnail Tester (upload 2-3 thumbnails, AI scores on composition/emotion/text legibility/CTR, '
-    'picks winner with reasoning). Built with Next.js 16, Tailwind CSS 4, shadcn/ui, magic-link auth, Turso database, '
-    'Z.AI GLM-4.5-flash for text AI, Groq Llama 4 Scout for vision. Deployed on Vercel. Live and fully functional.',
-    'Next.js 16, TypeScript, Tailwind CSS 4, shadcn/ui, Turso, Z.AI GLM-4.5, Groq Llama 4, Vercel',
-    'https://quirk-ten.vercel.app',
-    'quirk-ten.vercel.app'
+# Highlighted line — see all projects at portfolio
+story.append(Spacer(1, 6))
+see_more_html = '<b><font color="#8b6914">' + link(PORTFOLIO_URL, 'See all 15+ projects with live demos at arjunv.is-a.dev') + '</font></b>'
+story.append(Paragraph(
+    see_more_html,
+    ParagraphStyle('SeeMore', fontName='FreeSerif-Bold', fontSize=10, leading=13, alignment=1, textColor=colors.HexColor('#8b6914'))
 ))
-
-story.extend(project_entry(
-    'SmartAgro — AI Plant Disease Detection',
-    'AI system that helps farmers detect plant diseases and get remedies from image or text input. Uses CNN/Random Forest '
-    'for image classification and NLP for remedy queries, with a web interface and recent-query history.',
-    'Python, CNN, Random Forest, NLP, Web Interface',
-    'https://github.com/arjundroid12/SmartAgro-A-disease-detection-model-with-Human-Interaction',
-    'github.com/arjundroid12/SmartAgro-A-disease-detection-model-with-Human-Interaction'
-))
-
-story.extend(project_entry(
-    'FIOLA — AI Voice Assistant',
-    'Custom voice assistant built with LLMs and Python for speech recognition and task automation. Handles natural language '
-    'commands and executes tasks autonomously.',
-    'Python, LLM, Speech Recognition'
-))
-
-story.extend(project_entry(
-    'AI Agents Suite (4 Agents)',
-    'Built four autonomous AI agents: (1) Research Agent using the ReAct pattern for autonomous reasoning, (2) Multi-Agent '
-    'System where 3 AIs collaborate to solve problems, (3) Data Analyst Agent that writes and executes Python in-browser '
-    'via Pyodide, (4) Coding Agent — a mini v0.dev that generates HTML/CSS/JS from natural language descriptions.',
-    'Next.js, Cerebras, Pyodide, ReAct Pattern, Multi-Agent Systems'
-))
-
-story.extend(project_entry(
-    'Gesture Particle Painter & Gesture Volume Mixer',
-    'Two MediaPipe Hands projects: a gesture-controlled particle painter (paint with hand movements, mouse fallback) and a '
-    'volume mixer controlled by hand height, pinch-to-mute, and two-hand dual-channel control.',
-    'MediaPipe Hands, Web Audio API, Canvas API, JavaScript'
-))
-
-story.extend(project_entry(
-    'Realtime Chat & Realtime Whiteboard',
-    'Multi-user real-time applications built with Socket.io: a multi-room chat with typing indicators and online user list, '
-    'and a collaborative whiteboard with shared canvas, colors, brush sizes, and undo functionality.',
-    'Node.js, Express, Socket.io, WebSockets, Canvas API',
-    'https://github.com/arjundroid12/realtime-chat',
-    'github.com/arjundroid12/realtime-chat'
-))
-
-story.extend(project_entry(
-    'JWT Auth Demo & URL Shortener API',
-    'Production-style backend projects: JWT authentication with bcrypt password hashing, refresh tokens, and token rotation; '
-    'REST API for URL shortening with click analytics, custom aliases, and expiry support.',
-    'Node.js, Express, JWT, bcrypt, LowDB',
-    'https://github.com/arjundroid12/jwt-auth-demo',
-    'github.com/arjundroid12/jwt-auth-demo'
-))
-
-story.extend(project_entry(
-    'Frontend App Suite (6 Apps)',
-    'Six vanilla JS applications with live demos: Calculator (custom expression parser), Notes App (custom markdown parser, '
-    'tags, search), Weather App (Open-Meteo API, 5-day forecast), Kanban Todo (drag &amp; drop), Movie Explorer (search, '
-    'filters, favorites), Pomodoro Timer (stats charts, notifications). All deployed on surge.sh.',
-    'Vanilla JavaScript, HTML5, CSS3, localStorage, Chart.js, various APIs',
-    'https://github.com/arjundroid12',
-    'github.com/arjundroid12 (see repos)'
-))
+story.append(Spacer(1, 4))
 
 # ── Core Skills ──
 story.extend(section_header('Core Skills'))
