@@ -1732,10 +1732,10 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
           {AI_AGENTS.map((agent, i) => {
             // Dark purple glass cards — translucent, see-through, with purple glow accents
             const cardBgs: Record<string, string> = {
-              'AI Research Agent': 'rgba(20, 12, 35, 0.35)',
-              'Multi-Agent System': 'rgba(15, 10, 30, 0.35)',
-              'Data Analyst Agent': 'rgba(18, 12, 32, 0.35)',
-              'Coding Agent': 'rgba(22, 14, 38, 0.35)',
+              'AI Research Agent': 'rgba(20, 12, 35, 0.05)',
+              'Multi-Agent System': 'rgba(15, 10, 30, 0.05)',
+              'Data Analyst Agent': 'rgba(18, 12, 32, 0.05)',
+              'Coding Agent': 'rgba(22, 14, 38, 0.05)',
             }
             const cardAccents: Record<string, string> = {
               'AI Research Agent': '#a78bfa',
