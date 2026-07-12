@@ -4259,8 +4259,10 @@ export default function Home() {
   const [showVersionSelect, setShowVersionSelect] = useState(false)
 
   // Remember if user already chose a portfolio — skip splash on back/refresh
+  // If they chose terminal and press back, they land in dungeon directly
   useEffect(() => {
-    if (sessionStorage.getItem('quirk-experience') === 'dungeon') {
+    const choice = sessionStorage.getItem('quirk-experience')
+    if (choice === 'dungeon' || choice === 'terminal') {
       setEntered(true)
     }
   }, [])
