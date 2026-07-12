@@ -178,7 +178,7 @@ story.append(Paragraph(
 # ── Experience ──
 story.extend(section_header('Experience'))
 story.append(Paragraph('<b>Website Management &amp; Marketing Head</b>', job_title_style))
-story.append(Paragraph('AIOrders &times; Foodswipe &nbsp;|&nbsp; 2024 – Present &nbsp;|&nbsp; Remote', job_meta_style))
+story.append(Paragraph('AIOrders &times; Foodswipe &nbsp;|&nbsp; Nov 2025 – Present &nbsp;|&nbsp; Remote', job_meta_style))
 story.append(Paragraph('• <i>Leading website management and marketing across both AIOrders and Foodswipe brands.</i>', bullet_style))
 story.append(Paragraph('• Manage website updates, performance tuning, and content drops for two products simultaneously.', bullet_style))
 story.append(Paragraph('• Plan and run marketing campaigns across Instagram, Facebook, and Google Ads to drive reach and engagement.', bullet_style))
