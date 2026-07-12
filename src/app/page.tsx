@@ -1752,8 +1752,8 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
                 className={isMobileView ? "relative w-full h-auto min-h-[400px] rounded-3xl overflow-hidden flex flex-col mx-auto" : "relative shrink-0 w-[88vw] md:w-[55vw] lg:w-[42vw] h-[60vh] md:h-[56vh] rounded-3xl overflow-hidden flex flex-col mx-auto"}
                 style={{
                   background: bg,
-                  backdropFilter: 'blur(20px) saturate(150%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                  backdropFilter: 'blur(1px)',
+                  WebkitBackdropFilter: 'blur(1px)',
                   border: '1px solid rgba(167, 139, 250, 0.15)',
                   boxShadow: '0 25px 80px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
                 }}
