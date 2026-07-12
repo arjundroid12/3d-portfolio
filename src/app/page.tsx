@@ -1710,7 +1710,7 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
             transition={{ duration: 2, repeat: Infinity }}
             className="inline-block mb-2"
           >
-            <Badge variant="secondary" className="bg-teal-500/10 text-teal-400 border-teal-500/30 font-mono">{"// ai engineering"}</Badge>
+            <Badge variant="secondary" className="bg-amber-500/10 text-amber-400 border-amber-500/30 font-mono">{"// ai engineering"}</Badge>
           </motion.div>
           <h2
             className="text-4xl md:text-5xl font-bold mb-1 bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
@@ -1730,18 +1730,18 @@ function AgentsShowcase({ sound, onThemeChange }: { sound: any; onThemeChange?: 
           className={isMobileView ? "flex flex-col gap-6 w-full" : "agents-track flex gap-10 will-change-transform"}
         >
           {AI_AGENTS.map((agent, i) => {
-            // Distinct solid background per agent (Lenis-style opaque cards)
+            // Dungeon-themed agent cards — amber/gold/bronze palette
             const cardBgs: Record<string, string> = {
-              'AI Research Agent': 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
-              'Multi-Agent System': 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0c4a6e 100%)',
-              'Data Analyst Agent': 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #064e3b 100%)',
-              'Coding Agent': 'linear-gradient(135deg, #581c87 0%, #6b21a8 50%, #581c87 100%)',
+              'AI Research Agent': 'linear-gradient(135deg, #1a1208 0%, #2a1f0e 50%, #1a1208 100%)',
+              'Multi-Agent System': 'linear-gradient(135deg, #1a1408 0%, #2e2410 50%, #1a1408 100%)',
+              'Data Analyst Agent': 'linear-gradient(135deg, #14100a 0%, #28200e 50%, #14100a 100%)',
+              'Coding Agent': 'linear-gradient(135deg, #1c1408 0%, #2e2210 50%, #1c1408 100%)',
             }
             const cardAccents: Record<string, string> = {
-              'AI Research Agent': '#818cf8',
-              'Multi-Agent System': '#38bdf8',
-              'Data Analyst Agent': '#34d399',
-              'Coding Agent': '#c084fc',
+              'AI Research Agent': '#f0c060',
+              'Multi-Agent System': '#e0a040',
+              'Data Analyst Agent': '#d4a050',
+              'Coding Agent': '#fbbf24',
             }
             const bg = cardBgs[agent.name] || '#1e1b4b'
             const accent = cardAccents[agent.name] || '#818cf8'
@@ -4447,27 +4447,26 @@ export default function Home() {
       {!isMobile && <StarField />}
       {!isMobile && <FloatingPlanets />}
 
-      {/* ============ RED/BLACK THEME OVERLAY (agents section) ============ */}
-      {/* Fades in a deep crimson + pure black background when the agents
-          section is in view, fades out VERY slowly when scrolled past
-          to avoid a hard line between agents and transition sections. */}
+      {/* ============ AMBER/BLACK THEME OVERLAY (agents section) ============ */}
+      {/* Fades in a warm amber + dark brown background when the agents
+          section is in view — matches the dungeon aesthetic */}
       <motion.div
         className="fixed inset-0 z-[1] pointer-events-none"
         style={{
           opacity: redOverlayOpacity,
           background: `
-            radial-gradient(ellipse at 30% 20%, rgba(139, 0, 0, 0.55), transparent 55%),
-            radial-gradient(ellipse at 70% 80%, rgba(220, 20, 60, 0.40), transparent 60%),
-            linear-gradient(180deg, #0a0203 0%, #1a0507 50%, #0a0203 100%)
+            radial-gradient(ellipse at 30% 20%, rgba(120, 80, 20, 0.35), transparent 55%),
+            radial-gradient(ellipse at 70% 80%, rgba(180, 120, 40, 0.25), transparent 60%),
+            linear-gradient(180deg, #0a0805 0%, #15100a 50%, #0a0805 100%)
           `,
         }}
       />
-      {/* Subtle red vignette for the red theme */}
+      {/* Subtle warm vignette for the amber theme */}
       <motion.div
         className="fixed inset-0 z-[1] pointer-events-none"
         style={{
           opacity: redOverlayOpacity,
-          background: 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%)',
+          background: 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.5) 100%)',
         }}
       />
 
