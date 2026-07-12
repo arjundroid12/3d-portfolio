@@ -4505,8 +4505,8 @@ export default function Home() {
             boxShadow: navOnWhite
               ? '0 10px 30px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(0,0,0,0.06)'
               : '0 10px 30px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.32), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -1px 1.5px rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.19), 0 0 0 1px rgba(255,255,255,0.045)',
-            backdropFilter: 'blur(0.2px)',
-            WebkitBackdropFilter: 'blur(0.2px)',
+            backdropFilter: 'blur(3px) saturate(120%) hue-rotate(8deg)',
+            WebkitBackdropFilter: 'blur(3px) saturate(120%) hue-rotate(8deg)',
             transition: 'background 0.4s ease, box-shadow 0.4s ease',
           } as React.CSSProperties}
         >
