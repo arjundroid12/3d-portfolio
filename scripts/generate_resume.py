@@ -225,7 +225,7 @@ story.extend(project_entry(
     'smooths jitter, spells fire from fingertips with neon particle FX + Web Audio synth sounds. Six spells, '
     'cooldowns, combo counter. Pure vanilla JS, no deps. Live demo on GitHub Pages.',
     'MediaPipe Hands, Web Audio API, Canvas 2D, Vanilla JS, GitHub Pages',
-    'https://arjundroid12.github.io/spellcaster',
+    'https://spellcaster.vercel.app',
     'arjundroid12.github.io/spellcaster'
 ))
 
