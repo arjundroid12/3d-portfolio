@@ -3347,6 +3347,28 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile 
   const y = Math.sin(rad) * radius
   const rarity = getRarity(project.rarity)
 
+  // Only show cards in the front half of the wheel (right side)
+  // Cards in the back (left side) are hidden to prevent overlap glitches
+  const visibility = useTransform(rotation, (r: number) => {
+    const effectiveAngle = ((angle + r) % 360 + 360) % 360
+    // Show cards within -100° to +100° (front ~200° of the wheel)
+    const angleFromFront = Math.min(effectiveAngle, 360 - effectiveAngle)
+    if (angleFromFront > 100) {
+      return { opacity: 0, pointerEvents: 'none' as const, scale: 0.5 }
+    }
+    // Fade in cards near the edges
+    const fadeStart = 80
+    if (angleFromFront > fadeStart) {
+      const fadeAmount = 1 - (angleFromFront - fadeStart) / 20
+      return { opacity: fadeAmount, pointerEvents: 'auto' as const, scale: 0.8 + fadeAmount * 0.2 }
+    }
+    return { opacity: 1, pointerEvents: 'auto' as const, scale: 1 }
+  })
+
+  const opacityVal = useTransform(visibility, (v: any) => v.opacity)
+  const scaleVal = useTransform(visibility, (v: any) => v.scale)
+  const pointerVal = useTransform(visibility, (v: any) => v.pointerEvents)
+
   return (
     <div
       style={{
@@ -3358,8 +3380,8 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile 
       }}
     >
       <motion.div
-        style={{ rotate: counterRotation }}
-        whileHover={{ scale: 1.08, zIndex: 100 }}
+        style={{ rotate: counterRotation, opacity: opacityVal, scale: scaleVal, pointerEvents: pointerVal as any }}
+        whileHover={{ scale: 1.08, opacity: 1, zIndex: 100 }}
         whileTap={{ scale: 0.97 }}
         onMouseEnter={() => sound.playHover()}
         onClick={onClick}
