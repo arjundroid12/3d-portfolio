@@ -3338,8 +3338,8 @@ function AIChatWidget({ sound, onChat, onRoast }: { sound: any; onChat?: () => v
 // Outside the wheel, normal page scroll works.
 // Uses native wheel listener with passive:false to preventDefault.
 
-function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile }: {
-  project: any; angle: number; radius: number; rotation: any; sound: any; onClick: () => void; isMobile?: boolean
+function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile, index }: {
+  project: any; angle: number; radius: number; rotation: any; sound: any; onClick: () => void; isMobile?: boolean; index: number
 }) {
   const counterRotation = useTransform(rotation, (r: number) => -r)
   const rad = (angle * Math.PI) / 180
@@ -3354,7 +3354,7 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile 
         top: `calc(50% + ${y}px)`,
         left: `calc(50% + ${x}px)`,
         transform: 'translate(-50%, -50%)',
-        zIndex: 5,
+        zIndex: 5 + index,
       }}
     >
       <motion.div
@@ -3563,6 +3563,7 @@ function ProjectWheel({ projects, sound, onCardClick, onSpin }: { projects: any[
             sound={sound}
             onClick={() => { sound.playClick(); onCardClick(project) }}
             isMobile={isMobileView}
+            index={i}
           />
         ))}
       </motion.div>
