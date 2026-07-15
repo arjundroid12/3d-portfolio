@@ -3347,15 +3347,19 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile 
   const y = Math.sin(rad) * radius
   const rarity = getRarity(project.rarity)
 
-  // Dynamic z-index: cards closer to the right (angle 0°) get higher z-index
-  // This prevents cards on the left/back from being hidden behind front cards
-  const cardRotation = useTransform(rotation, (r: number) => {
+  // Dynamic opacity + scale based on wheel position
+  // Cards facing the user (right) are full opacity, cards in back fade slightly
+  const cardStyle = useTransform(rotation, (r: number) => {
     const effectiveAngle = ((angle + r) % 360 + 360) % 360
-    // Cards at 0° (right side, facing user) get highest z-index
-    // Cards at 180° (left side, back) get lowest z-index
-    const zIndex = Math.round(100 - Math.abs(((effectiveAngle + 180) % 360) - 180) * 0.5)
-    return zIndex
+    // 0° = right side (facing user), 180° = left side (back)
+    const facingFactor = Math.cos(effectiveAngle * Math.PI / 180) // 1 = front, -1 = back
+    const opacity = 0.4 + (facingFactor + 1) * 0.3 // 0.4 to 1.0
+    const scale = 0.7 + (facingFactor + 1) * 0.15 // 0.7 to 1.0
+    return { opacity, scale }
   })
+
+  const opacityVal = useTransform(cardStyle, (s: any) => s.opacity)
+  const scaleVal = useTransform(cardStyle, (s: any) => s.scale)
 
   return (
     <div
@@ -3364,12 +3368,12 @@ function WheelCard({ project, angle, radius, rotation, sound, onClick, isMobile 
         top: `calc(50% + ${y}px)`,
         left: `calc(50% + ${x}px)`,
         transform: 'translate(-50%, -50%)',
-        zIndex: cardRotation as any,
+        zIndex: 10,
       }}
     >
       <motion.div
-        style={{ rotate: counterRotation }}
-        whileHover={{ scale: 1.08 }}
+        style={{ rotate: counterRotation, opacity: opacityVal, scale: scaleVal }}
+        whileHover={{ scale: 1.08, opacity: 1, zIndex: 100 }}
         whileTap={{ scale: 0.97 }}
         onMouseEnter={() => sound.playHover()}
         onClick={onClick}
